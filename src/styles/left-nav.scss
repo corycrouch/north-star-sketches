@@ -1,12 +1,15 @@
 .left-nav {
   width: 240px;
-  min-height: 100svh;
+  height: 100svh;
+  position: sticky;
+  top: 0;
   display: flex;
   flex-direction: column;
   border-right: var(--stroke) solid var(--border);
   padding: 0;
   flex-shrink: 0;
   background: var(--plane);
+  overflow-y: auto;
 
   &__logo {
     display: flex;
