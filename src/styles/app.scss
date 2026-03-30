@@ -1,0 +1,23 @@
+.app-layout {
+  display: flex;
+  min-height: 100svh;
+
+  &__content {
+    flex: 1;
+    padding: 2rem 3rem;
+    font-size: var(--font-size-base);
+
+    h1 {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: var(--font-size-lg);
+      opacity: 0.6;
+    }
+  }
+}

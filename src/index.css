@@ -2,12 +2,15 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@import "@fontsource/architects-daughter";
+@import "@fontsource/short-stack";
+@import "@fontsource/patrick-hand";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif;
+    --font-heading: 'Patrick Hand', cursive;
+    --font-sans: 'Patrick Hand', cursive;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,6 +51,17 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ——— Global sketch tokens ——— */
+:root {
+    --stroke: 4px;
+    --font-size-base: 1.25rem;
+    --font-size-lg: 1.375rem;
+    --font-size-xl: 2.5rem;
+    --plane: rgba(0, 0, 0, 0.05);
+    --plane-blur: 2px;
+}
+
+/* ——— Theme: White (default) ——— */
 :root {
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
@@ -63,7 +77,7 @@
     --muted-foreground: oklch(0.556 0 0);
     --accent: oklch(0.97 0 0);
     --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
+    --destructive: oklch(0.205 0 0);
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
     --ring: oklch(0.708 0 0);
@@ -81,6 +95,76 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* ——— Theme: Blueprint (dark navy) ——— */
+[data-theme="blueprint"] {
+    --background: oklch(0.30 0.12 250);
+    --foreground: oklch(0.95 0.02 250);
+    --card: oklch(0.33 0.12 250);
+    --card-foreground: oklch(0.95 0.02 250);
+    --popover: oklch(0.33 0.12 250);
+    --popover-foreground: oklch(0.95 0.02 250);
+    --primary: oklch(0.95 0.02 250);
+    --primary-foreground: oklch(0.25 0.12 250);
+    --secondary: oklch(0.35 0.10 250);
+    --secondary-foreground: oklch(0.92 0.02 250);
+    --muted: oklch(0.35 0.10 250);
+    --muted-foreground: oklch(0.70 0.06 250);
+    --accent: oklch(0.38 0.10 250);
+    --accent-foreground: oklch(0.95 0.02 250);
+    --destructive: oklch(0.95 0.02 250);
+    --border: oklch(0.42 0.10 250);
+    --input: oklch(0.38 0.10 250);
+    --ring: oklch(0.65 0.08 250);
+    --chart-1: oklch(0.80 0.06 250);
+    --chart-2: oklch(0.65 0.08 250);
+    --chart-3: oklch(0.50 0.10 250);
+    --chart-4: oklch(0.40 0.10 250);
+    --chart-5: oklch(0.30 0.12 250);
+    --sidebar: oklch(0.28 0.12 250);
+    --sidebar-foreground: oklch(0.95 0.02 250);
+    --sidebar-primary: oklch(0.95 0.02 250);
+    --sidebar-primary-foreground: oklch(0.25 0.12 250);
+    --sidebar-accent: oklch(0.35 0.10 250);
+    --sidebar-accent-foreground: oklch(0.95 0.02 250);
+    --sidebar-border: oklch(0.42 0.10 250);
+    --sidebar-ring: oklch(0.65 0.08 250);
+}
+
+/* ——— Theme: Ocean (rgb 13 92 157) ——— */
+[data-theme="ocean"] {
+    --background: rgb(13, 92, 157);
+    --foreground: oklch(0.97 0 0);
+    --card: rgb(20, 102, 170);
+    --card-foreground: oklch(0.97 0 0);
+    --popover: rgb(20, 102, 170);
+    --popover-foreground: oklch(0.97 0 0);
+    --primary: oklch(0.97 0 0);
+    --primary-foreground: rgb(10, 72, 125);
+    --secondary: rgb(22, 108, 178);
+    --secondary-foreground: oklch(0.95 0 0);
+    --muted: rgb(22, 108, 178);
+    --muted-foreground: oklch(0.75 0.04 240);
+    --accent: rgb(30, 118, 188);
+    --accent-foreground: oklch(0.97 0 0);
+    --destructive: oklch(0.97 0 0);
+    --border: rgb(35, 125, 195);
+    --input: rgb(25, 112, 182);
+    --ring: rgb(60, 145, 210);
+    --chart-1: rgb(80, 160, 220);
+    --chart-2: rgb(50, 135, 200);
+    --chart-3: rgb(30, 110, 175);
+    --chart-4: rgb(18, 98, 162);
+    --chart-5: rgb(10, 80, 140);
+    --sidebar: rgb(8, 78, 135);
+    --sidebar-foreground: oklch(0.97 0 0);
+    --sidebar-primary: oklch(0.97 0 0);
+    --sidebar-primary-foreground: rgb(10, 72, 125);
+    --sidebar-accent: rgb(22, 108, 178);
+    --sidebar-accent-foreground: oklch(0.97 0 0);
+    --sidebar-border: rgb(35, 125, 195);
+    --sidebar-ring: rgb(60, 145, 210);
 }
 
 .dark {
@@ -122,7 +206,13 @@
     @apply border-border outline-ring/50;
     }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    font-size: 1.125rem;
+    background-color: var(--background);
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    background-size: 16px 16px;
     }
   html {
     @apply font-sans;

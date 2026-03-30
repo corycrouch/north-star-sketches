@@ -1,0 +1,108 @@
+.left-nav {
+  width: 240px;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  border-right: var(--stroke) solid var(--border);
+  padding: 0;
+  flex-shrink: 0;
+  background: var(--plane);
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem 1rem;
+  }
+
+  &__logo-img {
+    height: 3rem;
+    width: auto;
+    object-fit: contain;
+  }
+
+  &__divider {
+    height: var(--stroke);
+    background: var(--border);
+    margin: 0 0.75rem;
+  }
+
+  &__main,
+  &__bottom {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    gap: 2px;
+  }
+
+  &__spacer {
+    flex: 1;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--foreground);
+    font: inherit;
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: background 0.15s;
+    text-align: left;
+
+    &:hover {
+      background: var(--accent);
+    }
+
+    &--active {
+      background: var(--accent);
+      font-weight: 600;
+    }
+  }
+
+  &__icon {
+    font-size: 1.25rem;
+    opacity: 0.7;
+  }
+
+  &__label {
+    flex: 1;
+  }
+
+  &__chevron {
+    font-size: 1.125rem;
+    opacity: 0.4;
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: var(--font-size-base);
+
+    &:hover {
+      background: var(--accent);
+    }
+  }
+
+  &__avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: var(--stroke) solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+}

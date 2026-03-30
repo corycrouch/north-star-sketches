@@ -1,0 +1,51 @@
+.track-engagement {
+  &__tabs {
+    display: flex;
+    gap: 1.5rem;
+    border-bottom: var(--stroke) solid var(--border);
+    margin-top: 1rem;
+  }
+
+  &__tab {
+    padding: 0.5rem 0.25rem;
+    font: inherit;
+    font-size: var(--font-size-lg);
+    background: none;
+    border: none;
+    color: var(--foreground);
+    cursor: pointer;
+    opacity: 0.5;
+    position: relative;
+    padding-bottom: 0.75rem;
+    transition: opacity 0.15s;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &--active {
+      opacity: 1;
+      font-weight: 700;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: calc(var(--stroke) * -0.5);
+        left: 0;
+        right: 0;
+        height: var(--stroke);
+        background: var(--foreground);
+        border-radius: var(--stroke);
+      }
+    }
+  }
+
+  &__content {
+    padding-top: 1.5rem;
+
+    p {
+      font-size: var(--font-size-base);
+      opacity: 0.5;
+    }
+  }
+}
