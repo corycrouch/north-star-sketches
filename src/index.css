@@ -192,3 +192,12 @@
     @apply font-sans;
     }
 }
+
+/* Shared field label style — small uppercase label used across pages */
+.field-label {
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.45;
+}

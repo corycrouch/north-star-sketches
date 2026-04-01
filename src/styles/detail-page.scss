@@ -63,12 +63,6 @@
     font-weight: 700;
   }
 
-  &__stat-label {
-    font-size: 0.85rem;
-    opacity: 0.45;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
 
   &__fields {
     display: flex;
@@ -86,14 +80,10 @@
     display: flex;
     align-items: center;
     gap: 1.5rem;
-  }
 
-  &__field-label {
-    font-size: 0.85rem;
-    opacity: 0.45;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    min-width: 120px;
+    .field-label {
+      min-width: 120px;
+    }
   }
 
   &__section {

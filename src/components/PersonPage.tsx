@@ -34,13 +34,13 @@ export default function PersonPage({ lead, onBack, onBuyingGroupClick }: PersonP
           <span className="detail-page__stat-value">
             <ScoreBar score={lead.engagementScore} />
           </span>
-          <span className="detail-page__stat-label">Engagement Score</span>
+          <span className="field-label">Engagement Score</span>
         </div>
       </div>
 
       <div className="detail-page__fields">
         <div className="detail-page__field">
-          <span className="detail-page__field-label">Buying Group</span>
+          <span className="field-label">Buying Group</span>
           <a
             className="table-link"
             href="#"
@@ -52,7 +52,7 @@ export default function PersonPage({ lead, onBack, onBuyingGroupClick }: PersonP
           </a>
         </div>
         <div className="detail-page__field">
-          <span className="detail-page__field-label">Opportunity</span>
+          <span className="field-label">Opportunity</span>
           <span>{lead.opportunity}</span>
         </div>
       </div>

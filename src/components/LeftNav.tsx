@@ -54,6 +54,7 @@ function NavItemRow({ icon, label, hasSubmenu, active, onClick, buttonRef }: Nav
 interface PopoutProps {
   anchorRef: React.RefObject<HTMLButtonElement | null>
   onClose: () => void
+  onCreateDemo?: () => void
 }
 
 function usePopoutPosition(anchorRef: React.RefObject<HTMLButtonElement | null>) {
@@ -83,10 +84,15 @@ function useClickOutside(
   }, [popoutRef, anchorRef, onClose])
 }
 
-function CreatePopout({ anchorRef, onClose }: PopoutProps) {
+function CreatePopout({ anchorRef, onClose, onCreateDemo }: PopoutProps) {
   const popoutRef = useRef<HTMLDivElement>(null)
   const pos = usePopoutPosition(anchorRef)
   useClickOutside(popoutRef, anchorRef, onClose)
+
+  function handleDemoClick() {
+    onClose()
+    onCreateDemo?.()
+  }
 
   return createPortal(
     <div
@@ -94,7 +100,7 @@ function CreatePopout({ anchorRef, onClose }: PopoutProps) {
       ref={popoutRef}
       style={{ top: pos.top, left: pos.left }}
     >
-      <div className="share-popout__card">
+      <div className="share-popout__card share-popout__card--clickable" onClick={handleDemoClick} role="button" tabIndex={0}>
         <div className="share-popout__card-header">
           <span className="material-symbols-outlined share-popout__card-icon">slideshow</span>
           <span className="share-popout__card-title">Demo</span>
@@ -172,9 +178,10 @@ function SharePopout({ anchorRef, onClose }: PopoutProps) {
 interface LeftNavProps {
   activePage: string
   onNavigate: (page: string) => void
+  onCreateDemo: () => void
 }
 
-export default function LeftNav({ activePage, onNavigate }: LeftNavProps) {
+export default function LeftNav({ activePage, onNavigate, onCreateDemo }: LeftNavProps) {
   const [openPopout, setOpenPopout] = useState<string | null>(null)
   const createButtonRef = useRef<HTMLButtonElement>(null)
   const shareButtonRef = useRef<HTMLButtonElement>(null)
@@ -217,6 +224,7 @@ export default function LeftNav({ activePage, onNavigate }: LeftNavProps) {
         <CreatePopout
           anchorRef={createButtonRef}
           onClose={() => setOpenPopout(null)}
+          onCreateDemo={onCreateDemo}
         />
       )}
       {openPopout === "share" && (

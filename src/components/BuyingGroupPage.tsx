@@ -56,19 +56,19 @@ export default function BuyingGroupPage({ groupName, onBack, onPersonClick }: Bu
       <div className="detail-page__stats">
         <div className="detail-page__stat">
           <span className="detail-page__stat-value">{members.length}</span>
-          <span className="detail-page__stat-label">Members</span>
+          <span className="field-label">Members</span>
         </div>
         <div className="detail-page__stat">
           <span className="detail-page__stat-value">{topScore}</span>
-          <span className="detail-page__stat-label">Top Score</span>
+          <span className="field-label">Top Score</span>
         </div>
         <div className="detail-page__stat">
           <span className="detail-page__stat-value">{avgScore}</span>
-          <span className="detail-page__stat-label">Avg Score</span>
+          <span className="field-label">Avg Score</span>
         </div>
         <div className="detail-page__stat">
           <span className="detail-page__stat-value">{opportunities.length}</span>
-          <span className="detail-page__stat-label">Opportunities</span>
+          <span className="field-label">Opportunities</span>
         </div>
       </div>
 

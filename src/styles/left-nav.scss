@@ -135,6 +135,10 @@
     &:hover {
       background: var(--accent);
     }
+
+    &--clickable {
+      cursor: pointer;
+    }
   }
 
   &__card-header {
