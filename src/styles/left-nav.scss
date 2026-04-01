@@ -108,4 +108,78 @@
     font-weight: 600;
     opacity: 0.8;
   }
+
+}
+
+.share-popout {
+  position: fixed;
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--background);
+  border: var(--stroke) solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  width: max-content;
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    width: 240px;
+    padding: 1rem;
+    border: calc(var(--stroke) * 0.5) solid var(--border);
+    border-radius: var(--radius);
+    transition: background 0.12s;
+
+    &:hover {
+      background: var(--accent);
+    }
+  }
+
+  &__card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__card-icon {
+    font-size: 1.25rem;
+    opacity: 0.6;
+  }
+
+  &__card-title {
+    font-size: var(--font-size-base);
+    font-weight: 700;
+  }
+
+  &__card-image {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background: var(--plane);
+    border: calc(var(--stroke) * 0.5) solid var(--border);
+    border-radius: calc(var(--radius) * 0.75);
+    margin-bottom: 0.75rem;
+  }
+
+  &__card-desc {
+    font-size: 0.85rem;
+    opacity: 0.6;
+    line-height: 1.45;
+    margin-bottom: 0.5rem;
+  }
+
+  &__card-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--foreground);
+    opacity: 0.7;
+    text-decoration: none;
+    transition: opacity 0.12s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 }

@@ -26,6 +26,7 @@ interface GroupedTableProps<T> {
   getSortValue: (row: T, field: string) => string | number
   getGroupValue: (row: T, field: string) => string
   onGroupHeaderClick?: (label: string) => void
+  filterCount?: number
 }
 
 export default function GroupedTable<T>({
@@ -40,6 +41,7 @@ export default function GroupedTable<T>({
   getSortValue,
   getGroupValue,
   onGroupHeaderClick,
+  filterCount = 0,
 }: GroupedTableProps<T>) {
 
   const processed = useMemo(() => {
@@ -88,9 +90,21 @@ export default function GroupedTable<T>({
   return (
     <div className="grouped-table">
       <div className="grouped-table__controls">
-        <button className="grouped-table__fake-btn">
+        <button className="grouped-table__filter-btn">
           <span className="material-symbols-outlined grouped-table__fake-btn-icon">filter_alt</span>
-          Filter
+          Filtered by
+          {filterCount > 0 && (
+            <span className="grouped-table__filter-badge">{filterCount}</span>
+          )}
+        </button>
+        <span className="grouped-table__divider" />
+        <button className="grouped-table__fake-btn">
+          <span className="material-symbols-outlined grouped-table__fake-btn-icon">business</span>
+          Account
+        </button>
+        <button className="grouped-table__fake-btn">
+          <span className="material-symbols-outlined grouped-table__fake-btn-icon">work</span>
+          Role
         </button>
         <button className="grouped-table__fake-btn">
           <span className="material-symbols-outlined grouped-table__fake-btn-icon">view_column</span>

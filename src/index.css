@@ -97,43 +97,8 @@
     --sidebar-ring: oklch(0.708 0 0);
 }
 
-/* ——— Theme: Blueprint (dark navy) ——— */
+/* ——— Theme: Blueprint ——— */
 [data-theme="blueprint"] {
-    --background: oklch(0.30 0.12 250);
-    --foreground: oklch(0.95 0.02 250);
-    --card: oklch(0.33 0.12 250);
-    --card-foreground: oklch(0.95 0.02 250);
-    --popover: oklch(0.33 0.12 250);
-    --popover-foreground: oklch(0.95 0.02 250);
-    --primary: oklch(0.95 0.02 250);
-    --primary-foreground: oklch(0.25 0.12 250);
-    --secondary: oklch(0.35 0.10 250);
-    --secondary-foreground: oklch(0.92 0.02 250);
-    --muted: oklch(0.35 0.10 250);
-    --muted-foreground: oklch(0.70 0.06 250);
-    --accent: oklch(0.38 0.10 250);
-    --accent-foreground: oklch(0.95 0.02 250);
-    --destructive: oklch(0.95 0.02 250);
-    --border: oklch(0.42 0.10 250);
-    --input: oklch(0.38 0.10 250);
-    --ring: oklch(0.65 0.08 250);
-    --chart-1: oklch(0.80 0.06 250);
-    --chart-2: oklch(0.65 0.08 250);
-    --chart-3: oklch(0.50 0.10 250);
-    --chart-4: oklch(0.40 0.10 250);
-    --chart-5: oklch(0.30 0.12 250);
-    --sidebar: oklch(0.28 0.12 250);
-    --sidebar-foreground: oklch(0.95 0.02 250);
-    --sidebar-primary: oklch(0.95 0.02 250);
-    --sidebar-primary-foreground: oklch(0.25 0.12 250);
-    --sidebar-accent: oklch(0.35 0.10 250);
-    --sidebar-accent-foreground: oklch(0.95 0.02 250);
-    --sidebar-border: oklch(0.42 0.10 250);
-    --sidebar-ring: oklch(0.65 0.08 250);
-}
-
-/* ——— Theme: Ocean (rgb 13 92 157) ——— */
-[data-theme="ocean"] {
     --background: rgb(13, 92, 157);
     --foreground: oklch(0.97 0 0);
     --card: rgb(20, 102, 170);
@@ -146,7 +111,7 @@
     --secondary-foreground: oklch(0.95 0 0);
     --muted: rgb(22, 108, 178);
     --muted-foreground: oklch(0.75 0.04 240);
-    --accent: rgb(30, 118, 188);
+    --accent: rgb(17, 72, 122);
     --accent-foreground: oklch(0.97 0 0);
     --destructive: oklch(0.97 0 0);
     --border: rgb(35, 125, 195);
@@ -209,10 +174,19 @@
     @apply text-foreground;
     font-size: 1.125rem;
     background-color: var(--background);
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
-    background-size: 16px 16px;
+    position: relative;
+    }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("/Paper-Tile-2.png");
+    background-repeat: repeat;
+    background-size: 64px 64px;
+    mix-blend-mode: multiply;
+    opacity: 1;
+    pointer-events: none;
+    z-index: 0;
     }
   html {
     @apply font-sans;

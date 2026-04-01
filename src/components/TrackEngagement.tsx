@@ -48,7 +48,7 @@ function buildColumns(
 }
 
 const sortOptions = [
-  { key: "engagementScore", label: "Engagement Score" },
+  { key: "engagementScore", label: "Engagement" },
   { key: "name", label: "Name" },
   { key: "company", label: "Buying Group" },
   { key: "role", label: "Role" },

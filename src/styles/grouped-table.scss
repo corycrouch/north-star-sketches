@@ -57,6 +57,46 @@
     opacity: 0.5;
   }
 
+  &__divider {
+    width: 2px;
+    height: 2.35rem;
+    background: var(--border);
+  }
+
+  &__filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: none;
+    border: calc(var(--stroke) * 0.5) solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.35rem 0.65rem;
+    font: inherit;
+    font-size: 0.95rem;
+    color: var(--foreground);
+    cursor: pointer;
+    transition: background 0.12s;
+
+    &:hover {
+      background: var(--accent);
+    }
+  }
+
+  &__filter-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    background: var(--foreground);
+    color: var(--background);
+    border-radius: 999px;
+    padding: 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
   &__search {
     display: flex;
     align-items: center;
