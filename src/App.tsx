@@ -1,7 +1,10 @@
 import { useState } from "react"
 import type { Lead } from "@/data/leads"
 import LeftNav from "@/components/LeftNav"
-import TrackEngagement from "@/components/TrackEngagement"
+import TrackEngagement, {
+  type AcquisitionTabId,
+  type PipelineTabId,
+} from "@/components/TrackEngagement"
 import BuyingGroupPage from "@/components/BuyingGroupPage"
 import PersonPage from "@/components/PersonPage"
 import DemoPage from "@/components/DemoPage"
@@ -16,8 +19,19 @@ type SubPage =
   | { type: "buyingGroup"; name: string }
   | { type: "person"; lead: Lead }
 
+/** Main-area surface: Marketing/Sales are driven by nav sub-items (e.g. Leads, Buyers), not the accordion headers. */
+type Workspace =
+  | "Dashboard"
+  | "Library"
+  | "Demo"
+  | "Analytics"
+  | "Marketing"
+  | "Sales"
+
 function App() {
-  const [activePage, setActivePage] = useState("Lead Gen")
+  const [workspace, setWorkspace] = useState<Workspace>("Marketing")
+  const [marketingTab, setMarketingTab] = useState<AcquisitionTabId>("leads")
+  const [salesTab, setSalesTab] = useState<PipelineTabId>("buyers")
   const [subPage, setSubPage] = useState<SubPage>({ type: "none" })
   const [demoName, setDemoName] = useState("")
   const [flowBuilder, setFlowBuilder] = useState<{ open: boolean; title: string }>({
@@ -27,14 +41,28 @@ function App() {
   const [demoHasFlowPreview, setDemoHasFlowPreview] = useState(false)
 
   function handleNavigate(page: string) {
-    setActivePage(page)
     setSubPage({ type: "none" })
+    if (page === "Dashboard") setWorkspace("Dashboard")
+    else if (page === "Library") setWorkspace("Library")
+    else if (page === "Analytics") setWorkspace("Analytics")
   }
 
   function handleCreateDemo() {
     setDemoName("Untitled Demo")
     setDemoHasFlowPreview(false)
-    setActivePage("Demo")
+    setWorkspace("Demo")
+    setSubPage({ type: "none" })
+  }
+
+  function selectMarketingTab(id: AcquisitionTabId) {
+    setMarketingTab(id)
+    setWorkspace("Marketing")
+    setSubPage({ type: "none" })
+  }
+
+  function selectSalesTab(id: PipelineTabId) {
+    setSalesTab(id)
+    setWorkspace("Sales")
     setSubPage({ type: "none" })
   }
 
@@ -47,8 +75,8 @@ function App() {
   }
 
   function goBack() {
-    if (activePage === "Demo") {
-      setActivePage("Library")
+    if (workspace === "Demo") {
+      setWorkspace("Library")
       return
     }
     setSubPage({ type: "none" })
@@ -68,7 +96,7 @@ function App() {
   function openDemoFromLibrary(demo: DemoRecord) {
     setDemoName(demo.name)
     setDemoHasFlowPreview(false)
-    setActivePage("Demo")
+    setWorkspace("Demo")
   }
 
   if (flowBuilder.open) {
@@ -80,12 +108,16 @@ function App() {
   return (
     <div className="app-layout">
       <LeftNav
-        activePage={activePage}
+        workspace={workspace}
         onNavigate={handleNavigate}
         onCreateDemo={handleCreateDemo}
+        marketingTab={marketingTab}
+        salesTab={salesTab}
+        onMarketingTabSelect={selectMarketingTab}
+        onSalesTabSelect={selectSalesTab}
       />
       <main className="app-layout__content">
-        {activePage === "Demo" && (
+        {workspace === "Demo" && (
           <DemoPage
             initialName={demoName}
             onBack={goBack}
@@ -94,35 +126,37 @@ function App() {
             onClearFlowPreview={() => setDemoHasFlowPreview(false)}
           />
         )}
-        {activePage === "Library" && (
+        {workspace === "Library" && (
           <LibraryPage onOpenDemo={openDemoFromLibrary} />
         )}
-        {activePage === "Dashboard" && <DashboardPage />}
-        {(activePage === "Lead Gen" || activePage === "Deals") && subPage.type === "none" && (
+        {workspace === "Dashboard" && <DashboardPage />}
+        {(workspace === "Marketing" || workspace === "Sales") && subPage.type === "none" && (
           <TrackEngagement
-            view={activePage === "Lead Gen" ? "acquisition" : "pipeline"}
+            view={workspace === "Marketing" ? "acquisition" : "pipeline"}
+            acquisitionTab={marketingTab}
+            pipelineTab={salesTab}
             onPersonClick={openPerson}
             onBuyingGroupClick={openBuyingGroup}
           />
         )}
-        {(activePage === "Lead Gen" || activePage === "Deals") && subPage.type === "buyingGroup" && (
+        {(workspace === "Marketing" || workspace === "Sales") && subPage.type === "buyingGroup" && (
           <BuyingGroupPage
             groupName={subPage.name}
             onBack={goBack}
             onPersonClick={openPerson}
-            backLabel={activePage}
+            backLabel={workspace === "Marketing" ? "Marketing" : "Sales"}
           />
         )}
-        {(activePage === "Lead Gen" || activePage === "Deals") && subPage.type === "person" && (
+        {(workspace === "Marketing" || workspace === "Sales") && subPage.type === "person" && (
           <PersonPage
             lead={subPage.lead}
             onBack={goBack}
             onBuyingGroupClick={openBuyingGroup}
           />
         )}
-        {activePage !== "Lead Gen" && activePage !== "Deals" && activePage !== "Demo" && activePage !== "Library" && activePage !== "Dashboard" && (
+        {workspace === "Analytics" && (
           <>
-            <h1>{activePage}</h1>
+            <h1>Analytics</h1>
             <p>Start building your prototype here.</p>
           </>
         )}

@@ -10,11 +10,13 @@ export type TrackEngagementView = "acquisition" | "pipeline"
 
 interface TrackEngagementProps {
   view: TrackEngagementView
+  acquisitionTab: AcquisitionTabId
+  pipelineTab: PipelineTabId
   onPersonClick: (lead: Lead) => void
   onBuyingGroupClick: (group: string) => void
 }
 
-const ACQUISITION_TABS = [
+export const ACQUISITION_TABS = [
   { id: "leads", label: "Leads" },
   { id: "links-embeds", label: "Links & Embeds" },
   { id: "campaigns", label: "Campaigns" },
@@ -23,13 +25,13 @@ const ACQUISITION_TABS = [
   { id: "ab-tests", label: "A/B Tests" },
 ] as const
 
-const PIPELINE_TABS = [
+export const PIPELINE_TABS = [
   { id: "buyers", label: "Buyers" },
   { id: "deal-links", label: "Links" },
 ] as const
 
-type AcquisitionTabId = (typeof ACQUISITION_TABS)[number]["id"]
-type PipelineTabId = (typeof PIPELINE_TABS)[number]["id"]
+export type AcquisitionTabId = (typeof ACQUISITION_TABS)[number]["id"]
+export type PipelineTabId = (typeof PIPELINE_TABS)[number]["id"]
 
 function buildColumns(
   onPersonClick: (lead: Lead) => void,
@@ -100,11 +102,6 @@ function getGroupValue(row: Lead, field: string): string {
   }
 }
 
-const titles: Record<TrackEngagementView, string> = {
-  acquisition: "Lead Gen",
-  pipeline: "Deals",
-}
-
 function TabPlaceholder({ title, body }: { title: string; body: string }) {
   return (
     <div className="track-engagement__placeholder">
@@ -114,7 +111,13 @@ function TabPlaceholder({ title, body }: { title: string; body: string }) {
   )
 }
 
-export default function TrackEngagement({ view, onPersonClick, onBuyingGroupClick }: TrackEngagementProps) {
+export default function TrackEngagement({
+  view,
+  acquisitionTab,
+  pipelineTab,
+  onPersonClick,
+  onBuyingGroupClick,
+}: TrackEngagementProps) {
   const columns = buildColumns(onPersonClick, onBuyingGroupClick)
 
   const [leadsSortBy, setLeadsSortBy] = useState<string | null>("engagementScore")
@@ -124,39 +127,14 @@ export default function TrackEngagement({ view, onPersonClick, onBuyingGroupClic
   const [pipelineGroupBy, setPipelineGroupBy] = useState<string | null>("company")
 
   const isAcquisition = view === "acquisition"
-  const [acquisitionTab, setAcquisitionTab] = useState<AcquisitionTabId>("leads")
-  const [pipelineTab, setPipelineTab] = useState<PipelineTabId>("buyers")
+
+  const pageTitle = isAcquisition
+    ? ACQUISITION_TABS.find((t) => t.id === acquisitionTab)?.label ?? "Leads"
+    : PIPELINE_TABS.find((t) => t.id === pipelineTab)?.label ?? "Buyers"
 
   return (
     <div className="track-engagement">
-      <h1>{titles[view]}</h1>
-
-      <div className="track-engagement__tabs" role="tablist" aria-label={isAcquisition ? "Lead Gen sections" : "Deals sections"}>
-        {isAcquisition && ACQUISITION_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            role="tab"
-            aria-selected={acquisitionTab === tab.id}
-            className={`track-engagement__tab ${acquisitionTab === tab.id ? "track-engagement__tab--active" : ""}`}
-            onClick={() => setAcquisitionTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
-        {!isAcquisition && PIPELINE_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            role="tab"
-            aria-selected={pipelineTab === tab.id}
-            className={`track-engagement__tab ${pipelineTab === tab.id ? "track-engagement__tab--active" : ""}`}
-            onClick={() => setPipelineTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <h1>{pageTitle}</h1>
 
       <div className="track-engagement__content">
         {isAcquisition && acquisitionTab === "leads" && (

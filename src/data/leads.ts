@@ -9,7 +9,7 @@ export interface Lead {
   engagementScore: number
 }
 
-/** Lead Gen → Leads tab (formerly the “pipeline” fake list). */
+/** Marketing → Leads tab (formerly the “pipeline” fake list). */
 export const leadsData: Lead[] = [
   { firstName: "Nina", lastName: "Walsh", role: "VP Sales", company: "Snowflake", domain: "snowflake.com", account: "Snowflake NA", opportunity: "Enterprise renewal (FY27)", engagementScore: 94 },
   { firstName: "Omar", lastName: "Hassan", role: "Director of Ops", company: "MongoDB", domain: "mongodb.com", account: "MongoDB Atlas", opportunity: "Atlas multi-region expansion", engagementScore: 89 },
@@ -25,7 +25,7 @@ export const leadsData: Lead[] = [
   { firstName: "Diego", lastName: "Vargas", role: "Solutions Architect", company: "Elastic", domain: "elastic.co", account: "Elastic Cloud", opportunity: "Time-series workload POC", engagementScore: 33 },
 ]
 
-/** Deals → Buyers tab (formerly the “leads” fake list). */
+/** Sales → Buyers tab (formerly the “leads” fake list). */
 export const pipelineData: Lead[] = [
   { firstName: "Sarah", lastName: "Chen", role: "VP of Engineering", company: "Google", domain: "google.com", account: "Google Cloud", opportunity: "Cloud Platform Migration", engagementScore: 92 },
   { firstName: "Marcus", lastName: "Johnson", role: "Director of IT", company: "Salesforce", domain: "salesforce.com", account: "Salesforce Enterprise", opportunity: "DevOps Transformation", engagementScore: 87 },

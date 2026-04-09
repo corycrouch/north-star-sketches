@@ -9,13 +9,15 @@
   padding: 0;
   flex-shrink: 0;
   background: var(--plane);
-  overflow-y: auto;
+  /** Outer shell does not scroll — only `__scroll` does, so dividers + footer stay visible. */
+  overflow: hidden;
 
   &__logo {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 1.25rem 1rem;
+    flex-shrink: 0;
   }
 
   &__logo-img {
@@ -29,6 +31,14 @@
     justify-content: center;
     padding: 0 1.1rem 1.4rem;
     flex-shrink: 0;
+  }
+
+  /** Middle: nav items only; scrolls when Marketing/Sales accordions are tall. */
+  &__scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   &__create-pill {
@@ -89,20 +99,80 @@
 
   &__divider {
     height: var(--stroke);
+    min-height: var(--stroke);
     background: var(--border);
     margin: 0 0.75rem;
+    flex-shrink: 0;
   }
 
-  &__main,
-  &__bottom {
+  &__main {
     display: flex;
     flex-direction: column;
     padding: 0.5rem;
     gap: 2px;
   }
 
-  &__spacer {
-    flex: 1;
+  &__bottom {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  &__accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  &__accordion-chevron {
+    font-size: 1.125rem;
+    opacity: 0.45;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+    /* collapsed: chevron_right points right */
+
+    &--open {
+      transform: rotate(90deg); /* points down */
+    }
+  }
+
+  &__sublist {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0.35rem 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  &__subitem {
+    width: 100%;
+    text-align: left;
+    padding: 0.4rem 0.65rem 0.4rem 2.25rem;
+    border: none;
+    border-radius: calc(var(--radius) * 0.9);
+    background: transparent;
+    color: var(--foreground);
+    font: inherit;
+    font-size: calc(var(--font-size-base) * 0.92);
+    cursor: pointer;
+    opacity: 0.72;
+    transition:
+      background 0.15s,
+      opacity 0.15s;
+
+    &:hover {
+      background: var(--accent);
+      opacity: 0.95;
+    }
+
+    &--active {
+      opacity: 1;
+      font-weight: 600;
+      background: color-mix(in srgb, var(--accent) 85%, transparent);
+    }
   }
 
   &__item {
@@ -128,6 +198,15 @@
     &--active {
       background: var(--accent);
       font-weight: 600;
+    }
+
+    /** Accordion section labels (Marketing / Sales): expand/collapse only, not a destination. */
+    &--accordion-head {
+      font-weight: 500;
+
+      &:not(:hover) {
+        background: transparent;
+      }
     }
   }
 
@@ -161,6 +240,7 @@
     cursor: pointer;
     transition: background 0.15s;
     font-size: var(--font-size-base);
+    flex-shrink: 0;
 
     &:hover {
       background: var(--accent);

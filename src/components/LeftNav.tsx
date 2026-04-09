@@ -1,6 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { createPortal } from "react-dom"
 import Avatar from "@/components/Avatar"
+import {
+  ACQUISITION_TABS,
+  PIPELINE_TABS,
+  type AcquisitionTabId,
+  type PipelineTabId,
+} from "@/components/TrackEngagement"
 import "@/styles/left-nav.scss"
 
 interface NavItem {
@@ -19,10 +25,8 @@ interface NavItemRowProps extends NavItem {
   buttonRef?: React.Ref<HTMLButtonElement>
 }
 
-const mainNav: NavItem[] = [
+const mainNavRest: NavItem[] = [
   { icon: "speed", label: "Dashboard" },
-  { customIconSrc: "/funnel_top.svg", label: "Lead Gen" },
-  { customIconSrc: "/funnel_bottom.svg", label: "Deals" },
   { icon: "note_stack", label: "Library" },
   { icon: "analytics", label: "Analytics" },
 ]
@@ -33,6 +37,70 @@ const bottomNav: NavItem[] = [
   { icon: "cable", label: "Integrations", hasSubmenu: true },
   { icon: "help", label: "Help", hasSubmenu: true },
 ]
+
+interface NavAccordionProps {
+  label: string
+  icon?: string
+  customIconSrc?: string
+  expanded: boolean
+  /** True when main content is a tab in this suite (drives sub-item active state). */
+  suiteActive: boolean
+  activeSubId: string
+  onHeaderClick: () => void
+  onSubClick: (id: string) => void
+  subItems: readonly { readonly id: string; readonly label: string }[]
+}
+
+function NavAccordion({
+  label,
+  icon,
+  customIconSrc,
+  expanded,
+  suiteActive,
+  activeSubId,
+  onHeaderClick,
+  onSubClick,
+  subItems,
+}: NavAccordionProps) {
+  return (
+    <div className="left-nav__accordion">
+      <button
+        type="button"
+        className="left-nav__item left-nav__item--accordion-head"
+        onClick={onHeaderClick}
+        aria-expanded={expanded}
+      >
+        {customIconSrc ? (
+          <img src={customIconSrc} alt="" className="left-nav__icon left-nav__icon--custom" />
+        ) : (
+          <span className="material-symbols-outlined left-nav__icon">{icon}</span>
+        )}
+        <span className="left-nav__label">{label}</span>
+        <span
+          className={`material-symbols-outlined left-nav__accordion-chevron ${expanded ? "left-nav__accordion-chevron--open" : ""}`}
+          aria-hidden
+        >
+          chevron_right
+        </span>
+      </button>
+      {expanded && (
+        <ul className="left-nav__sublist" role="list">
+          {subItems.map((tab) => (
+            <li key={tab.id}>
+              <button
+                type="button"
+                className={`left-nav__subitem ${suiteActive && activeSubId === tab.id ? "left-nav__subitem--active" : ""}`}
+                onClick={() => onSubClick(tab.id)}
+              >
+                {tab.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
 
 function NavItemRow({ icon, customIconSrc, label, hasSubmenu, active, onClick, buttonRef }: NavItemRowProps) {
   return (
@@ -196,14 +264,30 @@ function CreatePopout({ anchorRef, onClose, onCreateDemo }: PopoutProps) {
   )
 }
 
+type Workspace = "Dashboard" | "Library" | "Demo" | "Analytics" | "Marketing" | "Sales"
+
 interface LeftNavProps {
-  activePage: string
+  workspace: Workspace
   onNavigate: (page: string) => void
   onCreateDemo: () => void
+  marketingTab: AcquisitionTabId
+  salesTab: PipelineTabId
+  onMarketingTabSelect: (id: AcquisitionTabId) => void
+  onSalesTabSelect: (id: PipelineTabId) => void
 }
 
-export default function LeftNav({ activePage, onNavigate, onCreateDemo }: LeftNavProps) {
+export default function LeftNav({
+  workspace,
+  onNavigate,
+  onCreateDemo,
+  marketingTab,
+  salesTab,
+  onMarketingTabSelect,
+  onSalesTabSelect,
+}: LeftNavProps) {
   const [openPopout, setOpenPopout] = useState<string | null>(null)
+  const [marketingOpen, setMarketingOpen] = useState(true)
+  const [salesOpen, setSalesOpen] = useState(false)
   const createButtonRef = useRef<HTMLButtonElement>(null)
 
   const handleNav = useCallback((label: string, popout?: string) => {
@@ -214,6 +298,26 @@ export default function LeftNav({ activePage, onNavigate, onCreateDemo }: LeftNa
       onNavigate(label)
     }
   }, [onNavigate])
+
+  function toggleMarketingAccordion() {
+    setOpenPopout(null)
+    setMarketingOpen((o) => !o)
+  }
+
+  function toggleSalesAccordion() {
+    setOpenPopout(null)
+    setSalesOpen((o) => !o)
+  }
+
+  function pickMarketingTab(id: string) {
+    setMarketingOpen(true)
+    onMarketingTabSelect(id as AcquisitionTabId)
+  }
+
+  function pickSalesTab(id: string) {
+    setSalesOpen(true)
+    onSalesTabSelect(id as PipelineTabId)
+  }
 
   function toggleCreateMenu() {
     setOpenPopout((prev) => (prev === "create" ? null : "create"))
@@ -241,15 +345,43 @@ export default function LeftNav({ activePage, onNavigate, onCreateDemo }: LeftNa
 
       <div className="left-nav__divider" />
 
-      <div className="left-nav__main">
-        {mainNav.map((item) => (
+      <div className="left-nav__scroll">
+        <div className="left-nav__main">
           <NavItemRow
-            key={item.label}
-            {...item}
-            active={activePage === item.label}
-            onClick={() => handleNav(item.label, item.popout)}
+            icon="speed"
+            label="Dashboard"
+            active={workspace === "Dashboard"}
+            onClick={() => handleNav("Dashboard")}
           />
-        ))}
+          <NavAccordion
+            label="Marketing"
+            customIconSrc="/funnel_top.svg"
+            expanded={marketingOpen}
+            suiteActive={workspace === "Marketing"}
+            activeSubId={marketingTab}
+            subItems={ACQUISITION_TABS}
+            onHeaderClick={toggleMarketingAccordion}
+            onSubClick={pickMarketingTab}
+          />
+          <NavAccordion
+            label="Sales"
+            customIconSrc="/funnel_bottom.svg"
+            expanded={salesOpen}
+            suiteActive={workspace === "Sales"}
+            activeSubId={salesTab}
+            subItems={PIPELINE_TABS}
+            onHeaderClick={toggleSalesAccordion}
+            onSubClick={pickSalesTab}
+          />
+          {mainNavRest.map((item) => (
+            <NavItemRow
+              key={item.label}
+              {...item}
+              active={workspace === item.label}
+              onClick={() => handleNav(item.label, item.popout)}
+            />
+          ))}
+        </div>
       </div>
 
       {openPopout === "create" && (
@@ -259,7 +391,6 @@ export default function LeftNav({ activePage, onNavigate, onCreateDemo }: LeftNa
           onCreateDemo={onCreateDemo}
         />
       )}
-      <div className="left-nav__spacer" />
       <div className="left-nav__divider" />
 
       <div className="left-nav__bottom">
@@ -267,7 +398,7 @@ export default function LeftNav({ activePage, onNavigate, onCreateDemo }: LeftNa
           <NavItemRow
             key={item.label}
             {...item}
-            active={activePage === item.label}
+            active={false}
             onClick={() => handleNav(item.label, item.popout)}
           />
         ))}
