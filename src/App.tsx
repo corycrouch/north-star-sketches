@@ -5,6 +5,10 @@ import TrackEngagement from "@/components/TrackEngagement"
 import BuyingGroupPage from "@/components/BuyingGroupPage"
 import PersonPage from "@/components/PersonPage"
 import DemoPage from "@/components/DemoPage"
+import FlowBuilderPage from "@/components/FlowBuilderPage"
+import LibraryPage from "@/components/LibraryPage"
+import DashboardPage from "@/components/DashboardPage"
+import type { DemoRecord } from "@/data/demos"
 import "@/styles/app.scss"
 
 type SubPage =
@@ -12,22 +16,15 @@ type SubPage =
   | { type: "buyingGroup"; name: string }
   | { type: "person"; lead: Lead }
 
-function formatDefaultDemoName() {
-  const now = new Date()
-  return now.toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  }) + " Demo"
-}
-
 function App() {
-  const [activePage, setActivePage] = useState("Track Engagement")
+  const [activePage, setActivePage] = useState("Lead Gen")
   const [subPage, setSubPage] = useState<SubPage>({ type: "none" })
   const [demoName, setDemoName] = useState("")
+  const [flowBuilder, setFlowBuilder] = useState<{ open: boolean; title: string }>({
+    open: false,
+    title: "",
+  })
+  const [demoHasFlowPreview, setDemoHasFlowPreview] = useState(false)
 
   function handleNavigate(page: string) {
     setActivePage(page)
@@ -35,7 +32,8 @@ function App() {
   }
 
   function handleCreateDemo() {
-    setDemoName(formatDefaultDemoName())
+    setDemoName("Untitled Demo")
+    setDemoHasFlowPreview(false)
     setActivePage("Demo")
     setSubPage({ type: "none" })
   }
@@ -50,10 +48,33 @@ function App() {
 
   function goBack() {
     if (activePage === "Demo") {
-      setActivePage("Track Engagement")
+      setActivePage("Library")
       return
     }
     setSubPage({ type: "none" })
+  }
+
+  function openFlowBuilder(demoTitle: string) {
+    setFlowBuilder({ open: true, title: demoTitle })
+  }
+
+  function closeFlowBuilder(result: { hasCannedFlow: boolean }) {
+    setFlowBuilder({ open: false, title: "" })
+    if (result.hasCannedFlow) {
+      setDemoHasFlowPreview(true)
+    }
+  }
+
+  function openDemoFromLibrary(demo: DemoRecord) {
+    setDemoName(demo.name)
+    setDemoHasFlowPreview(false)
+    setActivePage("Demo")
+  }
+
+  if (flowBuilder.open) {
+    return (
+      <FlowBuilderPage demoTitle={flowBuilder.title} onClose={closeFlowBuilder} />
+    )
   }
 
   return (
@@ -68,29 +89,38 @@ function App() {
           <DemoPage
             initialName={demoName}
             onBack={goBack}
+            onOpenFlowBuilder={openFlowBuilder}
+            hasFlowPreview={demoHasFlowPreview}
+            onClearFlowPreview={() => setDemoHasFlowPreview(false)}
           />
         )}
-        {activePage === "Track Engagement" && subPage.type === "none" && (
+        {activePage === "Library" && (
+          <LibraryPage onOpenDemo={openDemoFromLibrary} />
+        )}
+        {activePage === "Dashboard" && <DashboardPage />}
+        {(activePage === "Lead Gen" || activePage === "Deals") && subPage.type === "none" && (
           <TrackEngagement
+            view={activePage === "Lead Gen" ? "acquisition" : "pipeline"}
             onPersonClick={openPerson}
             onBuyingGroupClick={openBuyingGroup}
           />
         )}
-        {activePage === "Track Engagement" && subPage.type === "buyingGroup" && (
+        {(activePage === "Lead Gen" || activePage === "Deals") && subPage.type === "buyingGroup" && (
           <BuyingGroupPage
             groupName={subPage.name}
             onBack={goBack}
             onPersonClick={openPerson}
+            backLabel={activePage}
           />
         )}
-        {activePage === "Track Engagement" && subPage.type === "person" && (
+        {(activePage === "Lead Gen" || activePage === "Deals") && subPage.type === "person" && (
           <PersonPage
             lead={subPage.lead}
             onBack={goBack}
             onBuyingGroupClick={openBuyingGroup}
           />
         )}
-        {activePage !== "Track Engagement" && activePage !== "Demo" && (
+        {activePage !== "Lead Gen" && activePage !== "Deals" && activePage !== "Demo" && activePage !== "Library" && activePage !== "Dashboard" && (
           <>
             <h1>{activePage}</h1>
             <p>Start building your prototype here.</p>

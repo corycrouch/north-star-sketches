@@ -43,6 +43,9 @@ export default function GroupedTable<T>({
   onGroupHeaderClick,
   filterCount = 0,
 }: GroupedTableProps<T>) {
+  /** First option = flat list (no group headers); second = group by that field key. */
+  const flatViewKey = groupOptions[0]?.key ?? "individual"
+  const groupedFieldKey = groupOptions[1]?.key ?? "company"
 
   const processed = useMemo(() => {
     let rows = [...data]
@@ -118,14 +121,11 @@ export default function GroupedTable<T>({
           onChange={onSortChange}
         />
         <DropdownButton
-          icon={groupBy ? "workspaces" : "person"}
+          icon={groupBy === groupedFieldKey ? "workspaces" : "person"}
           label="View by"
-          options={[
-            { key: "individual", label: "Individual" },
-            { key: "group", label: "Group" },
-          ]}
-          value={groupBy ? "group" : "individual"}
-          onChange={(key) => onGroupChange(key === "group" ? (groupOptions[0]?.key ?? null) : null)}
+          options={groupOptions}
+          value={groupBy ? groupedFieldKey : flatViewKey}
+          onChange={(key) => onGroupChange(key === flatViewKey ? null : key)}
           allowDeselect={false}
         />
         <div className="grouped-table__search">

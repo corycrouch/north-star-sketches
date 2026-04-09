@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import CannedFlowGraphic, { getCannedFlowContentSummary } from "@/components/CannedFlowGraphic"
 import "@/styles/demo-page.scss"
 
 interface ContentItem {
@@ -10,8 +12,8 @@ interface ContentItem {
 const CONTENT_TYPES: { type: ContentItem["type"]; icon: string; label: string }[] = [
   { type: "video", icon: "videocam", label: "Video" },
   { type: "tour", icon: "tour", label: "Tour" },
+  { type: "document", icon: "description", label: "SmartDoc" },
   { type: "sandbox", icon: "code_blocks", label: "Sandbox" },
-  { type: "document", icon: "description", label: "Document" },
 ]
 
 interface LibraryItem {
@@ -34,6 +36,10 @@ const LIBRARY_ITEMS: LibraryItem[] = [
 interface DemoPageProps {
   initialName: string
   onBack: () => void
+  onOpenFlowBuilder: (demoTitle: string) => void
+  /** Set when returning from Flow Builder with the canned sample flow on canvas */
+  hasFlowPreview?: boolean
+  onClearFlowPreview?: () => void
 }
 
 let nextId = 100
@@ -50,14 +56,20 @@ function formatCreatedDate() {
   })
 }
 
-export default function DemoPage({ initialName, onBack }: DemoPageProps) {
+export default function DemoPage({
+  initialName,
+  onBack,
+  onOpenFlowBuilder,
+  hasFlowPreview = false,
+  onClearFlowPreview,
+}: DemoPageProps) {
   const [name, setName] = useState(initialName)
   const [isEditing, setIsEditing] = useState(false)
   const [viewerTitle, setViewerTitle] = useState("")
   const [description, setDescription] = useState("")
   const [status, setStatus] = useState<"draft" | "published">("draft")
   const [contentItems, setContentItems] = useState<ContentItem[]>([])
-  const [multiMode, setMultiMode] = useState<"sequential" | "flow">("sequential")
+
   const [visualTheme, setVisualTheme] = useState("default")
   const [createdAt] = useState(formatCreatedDate)
   const [showLibrary, setShowLibrary] = useState(false)
@@ -151,18 +163,67 @@ export default function DemoPage({ initialName, onBack }: DemoPageProps) {
               Published
             </button>
           </div>
-          <button className="demo-page__action-btn">
+          <button type="button" className="demo-page__action-btn">
             <span className="material-symbols-outlined">play_arrow</span>
             Preview
           </button>
-          <button className="demo-page__action-btn">
+          <button type="button" className="demo-page__action-btn demo-page__action-btn--primary">
             <span className="material-symbols-outlined">send</span>
             Share
           </button>
         </div>
       </div>
 
-      {itemCount === 0 && (
+      {itemCount === 0 && hasFlowPreview && (
+        <div className="demo-page__content">
+          <div className="demo-page__single-preview demo-page__single-preview--flow">
+            <div className="demo-page__single-preview-stage">
+              <div className="demo-page__flow-preview-graphic">
+                <CannedFlowGraphic compact />
+              </div>
+              <button
+                type="button"
+                className="demo-page__single-preview-edit"
+                onClick={() => onOpenFlowBuilder(name)}
+                aria-label="Edit flow"
+              >
+                <span className="material-symbols-outlined">edit</span>
+              </button>
+            </div>
+            <div className="demo-page__single-preview-bar">
+              <div className="demo-page__item-info">
+                <span className="field-label">
+                  <span className="material-symbols-outlined demo-page__item-icon">account_tree</span>
+                  Flow
+                </span>
+                <span className="demo-page__item-name">{getCannedFlowContentSummary()}</span>
+              </div>
+              <button
+                className="demo-page__item-remove"
+                onClick={() => onClearFlowPreview?.()}
+                title="Remove flow"
+                type="button"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="demo-page__flow-create-btn demo-page__flow-create-btn--split"
+            onClick={() => onOpenFlowBuilder(name)}
+          >
+            <span className="demo-page__flow-create-lead">
+              <span className="material-symbols-outlined">add</span>
+              Add content
+            </span>
+            <span className="demo-page__flow-create-trail">Edit flow</span>
+          </button>
+        </div>
+      )}
+
+      {itemCount === 0 && !hasFlowPreview && (
         <div className="demo-page__empty">
           <div className="demo-page__empty-prompt">
             <p>Create new content</p>
@@ -179,59 +240,77 @@ export default function DemoPage({ initialName, onBack }: DemoPageProps) {
               </button>
             ))}
           </div>
+          <div className="demo-page__library-choose">
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              className="demo-page__library-ghost-btn"
+              onClick={() => setShowLibrary(!showLibrary)}
+              aria-expanded={showLibrary}
+            >
+              <span className="material-symbols-outlined">note_stack</span>
+              Choose from Library
+            </Button>
+            {showLibrary && (
+              <div className="demo-page__library-picker">
+                <div className="demo-page__library-header">
+                  <div className="demo-page__library-search-wrap">
+                    <span className="material-symbols-outlined">search</span>
+                    <input
+                      className="demo-page__library-search"
+                      placeholder="Search library..."
+                      value={librarySearch}
+                      onChange={(e) => setLibrarySearch(e.target.value)}
+                      autoFocus
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="demo-page__library-close"
+                    onClick={() => { setShowLibrary(false); setLibrarySearch("") }}
+                  >
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+                <div className="demo-page__library-list">
+                  {filteredLibrary.map((item) => {
+                    const ct = CONTENT_TYPES.find((t) => t.type === item.type)!
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className="demo-page__library-item"
+                        onClick={() => addFromLibrary(item)}
+                      >
+                        <span className="material-symbols-outlined demo-page__library-item-icon">{ct.icon}</span>
+                        <span className="demo-page__library-item-name">{item.name}</span>
+                        <span className="field-label">{ct.label}</span>
+                      </button>
+                    )
+                  })}
+                  {filteredLibrary.length === 0 && (
+                    <div className="demo-page__library-empty">No matching items</div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
           <div className="demo-page__divider-or">
             <span className="demo-page__divider-line" />
             <span className="demo-page__divider-text">or</span>
             <span className="demo-page__divider-line" />
           </div>
-          <button
-            className="demo-page__library-btn"
-            onClick={() => setShowLibrary(!showLibrary)}
-          >
-            <span className="material-symbols-outlined">note_stack</span>
-            Choose from Library
-          </button>
-          {showLibrary && (
-            <div className="demo-page__library-picker">
-              <div className="demo-page__library-header">
-                <div className="demo-page__library-search-wrap">
-                  <span className="material-symbols-outlined">search</span>
-                  <input
-                    className="demo-page__library-search"
-                    placeholder="Search library..."
-                    value={librarySearch}
-                    onChange={(e) => setLibrarySearch(e.target.value)}
-                    autoFocus
-                  />
-                </div>
-                <button
-                  className="demo-page__library-close"
-                  onClick={() => { setShowLibrary(false); setLibrarySearch("") }}
-                >
-                  <span className="material-symbols-outlined">close</span>
-                </button>
-              </div>
-              <div className="demo-page__library-list">
-                {filteredLibrary.map((item) => {
-                  const ct = CONTENT_TYPES.find((t) => t.type === item.type)!
-                  return (
-                    <button
-                      key={item.id}
-                      className="demo-page__library-item"
-                      onClick={() => addFromLibrary(item)}
-                    >
-                      <span className="material-symbols-outlined demo-page__library-item-icon">{ct.icon}</span>
-                      <span className="demo-page__library-item-name">{item.name}</span>
-                      <span className="field-label">{ct.label}</span>
-                    </button>
-                  )
-                })}
-                {filteredLibrary.length === 0 && (
-                  <div className="demo-page__library-empty">No matching items</div>
-                )}
-              </div>
-            </div>
-          )}
+          <div className="demo-page__empty-actions">
+            <button
+              type="button"
+              className="demo-page__library-btn"
+              onClick={() => onOpenFlowBuilder(name)}
+            >
+              <span className="material-symbols-outlined">account_tree</span>
+              Build Flow
+            </button>
+          </div>
         </div>
       )}
 
@@ -265,213 +344,59 @@ export default function DemoPage({ initialName, onBack }: DemoPageProps) {
               </div>
             </div>
 
-            <div className="demo-page__add-more">
-              <div className="demo-page__add-more-col">
-                <span className="field-label">Create new</span>
-                <div className="demo-page__add-more-buttons">
-                  {CONTENT_TYPES.map((ct) => (
-                    <button
-                      key={ct.type}
-                      className="demo-page__add-btn"
-                      onClick={() => addContent(ct.type)}
-                      title={ct.label}
-                    >
-                      <span className="material-symbols-outlined">{ct.icon}</span>
-                      <span>{ct.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="demo-page__add-more-col">
-                <span className="field-label">Add existing</span>
-                <div className="demo-page__add-more-buttons">
-                  <button
-                    className="demo-page__add-btn demo-page__add-btn--library"
-                    onClick={() => setShowLibrary(!showLibrary)}
-                  >
-                    <span className="material-symbols-outlined">note_stack</span>
-                    <span>From Library</span>
-                  </button>
-                </div>
-              </div>
-              {showLibrary && (
-                <div className="demo-page__library-picker">
-                  <div className="demo-page__library-header">
-                    <div className="demo-page__library-search-wrap">
-                      <span className="material-symbols-outlined">search</span>
-                      <input
-                        className="demo-page__library-search"
-                        placeholder="Search library..."
-                        value={librarySearch}
-                        onChange={(e) => setLibrarySearch(e.target.value)}
-                        autoFocus
-                      />
-                    </div>
-                    <button
-                      className="demo-page__library-close"
-                      onClick={() => { setShowLibrary(false); setLibrarySearch("") }}
-                    >
-                      <span className="material-symbols-outlined">close</span>
-                    </button>
-                  </div>
-                  <div className="demo-page__library-list">
-                    {filteredLibrary.map((item) => {
-                      const ct = CONTENT_TYPES.find((t) => t.type === item.type)!
-                      return (
-                        <button
-                          key={item.id}
-                          className="demo-page__library-item"
-                          onClick={() => addFromLibrary(item)}
-                        >
-                          <span className="material-symbols-outlined demo-page__library-item-icon">{ct.icon}</span>
-                          <span className="demo-page__library-item-name">{item.name}</span>
-                          <span className="field-label">{ct.label}</span>
-                        </button>
-                      )
-                    })}
-                    {filteredLibrary.length === 0 && (
-                      <div className="demo-page__library-empty">No matching items</div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+            <button
+              type="button"
+              className="demo-page__flow-create-btn demo-page__flow-create-btn--split"
+              onClick={() => onOpenFlowBuilder(name)}
+            >
+              <span className="demo-page__flow-create-lead">
+                <span className="material-symbols-outlined">account_tree</span>
+                Add more content
+              </span>
+              <span className="demo-page__flow-create-trail">Build a Flow</span>
+            </button>
           </div>
         )
       })()}
 
       {itemCount >= 2 && (
         <div className="demo-page__content">
-          <div className="demo-page__mode-toggle">
-            <button
-              className={`demo-page__mode-btn ${multiMode === "sequential" ? "demo-page__mode-btn--active" : ""}`}
-              onClick={() => setMultiMode("sequential")}
-            >
-              <span className="material-symbols-outlined">playlist_play</span>
-              Sequential
-            </button>
-            <button
-              className={`demo-page__mode-btn ${multiMode === "flow" ? "demo-page__mode-btn--active" : ""}`}
-              onClick={() => setMultiMode("flow")}
-            >
-              <span className="material-symbols-outlined">account_tree</span>
-              Flow
-            </button>
-          </div>
-
-          {multiMode === "sequential" && (
-            <div className="demo-page__items">
-              {contentItems.map((item, index) => {
-                const ct = CONTENT_TYPES.find((t) => t.type === item.type)!
-                return (
-                  <div key={item.id} className="demo-page__item-card">
-                    <span className="material-symbols-outlined demo-page__drag-handle">drag_indicator</span>
-                    <span className="demo-page__item-number">{index + 1}</span>
-                    <div className="demo-page__item-thumb">
-                      <span className="material-symbols-outlined">play_arrow</span>
-                    </div>
-                    <div className="demo-page__item-info">
-                      <span className="field-label">
-                        <span className="material-symbols-outlined demo-page__item-icon">{ct.icon}</span>
-                        {ct.label}
-                      </span>
-                      <span className="demo-page__item-name">{item.name}</span>
-                    </div>
-                    <button
-                      className="demo-page__item-remove"
-                      onClick={() => removeContent(item.id)}
-                      title="Remove"
-                    >
-                      <span className="material-symbols-outlined">close</span>
-                    </button>
+          <div className="demo-page__items">
+            {contentItems.map((item, index) => {
+              const ct = CONTENT_TYPES.find((t) => t.type === item.type)!
+              return (
+                <div key={item.id} className="demo-page__item-card">
+                  <span className="demo-page__item-number">{index + 1}</span>
+                  <div className="demo-page__item-thumb">
+                    <span className="material-symbols-outlined">play_arrow</span>
                   </div>
-                )
-              })}
-            </div>
-          )}
-
-          {multiMode === "flow" && (
-            <div className="demo-page__flow-placeholder">
-              <span className="material-symbols-outlined">account_tree</span>
-              <p>Choose various paths for discovering your content</p>
-              <button className="demo-page__flow-create-btn">
-                <span className="material-symbols-outlined">add</span>
-                Create Flow
-              </button>
-            </div>
-          )}
-
-          <div className="demo-page__add-more">
-            <div className="demo-page__add-more-col">
-              <span className="field-label">Create new</span>
-              <div className="demo-page__add-more-buttons">
-                {CONTENT_TYPES.map((ct) => (
-                  <button
-                    key={ct.type}
-                    className="demo-page__add-btn"
-                    onClick={() => addContent(ct.type)}
-                    title={ct.label}
-                  >
-                    <span className="material-symbols-outlined">{ct.icon}</span>
-                    <span>{ct.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="demo-page__add-more-col">
-              <span className="field-label">Add existing</span>
-              <div className="demo-page__add-more-buttons">
-                <button
-                  className="demo-page__add-btn demo-page__add-btn--library"
-                  onClick={() => setShowLibrary(!showLibrary)}
-                >
-                  <span className="material-symbols-outlined">note_stack</span>
-                  <span>From Library</span>
-                </button>
-              </div>
-            </div>
-            {showLibrary && (
-              <div className="demo-page__library-picker">
-                <div className="demo-page__library-header">
-                  <div className="demo-page__library-search-wrap">
-                    <span className="material-symbols-outlined">search</span>
-                    <input
-                      className="demo-page__library-search"
-                      placeholder="Search library..."
-                      value={librarySearch}
-                      onChange={(e) => setLibrarySearch(e.target.value)}
-                      autoFocus
-                    />
+                  <div className="demo-page__item-info">
+                    <span className="field-label">
+                      <span className="material-symbols-outlined demo-page__item-icon">{ct.icon}</span>
+                      {ct.label}
+                    </span>
+                    <span className="demo-page__item-name">{item.name}</span>
                   </div>
                   <button
-                    className="demo-page__library-close"
-                    onClick={() => { setShowLibrary(false); setLibrarySearch("") }}
+                    className="demo-page__item-remove"
+                    onClick={() => removeContent(item.id)}
+                    title="Remove"
                   >
                     <span className="material-symbols-outlined">close</span>
                   </button>
                 </div>
-                <div className="demo-page__library-list">
-                  {filteredLibrary.map((item) => {
-                    const ct = CONTENT_TYPES.find((t) => t.type === item.type)!
-                    return (
-                      <button
-                        key={item.id}
-                        className="demo-page__library-item"
-                        onClick={() => addFromLibrary(item)}
-                      >
-                        <span className="material-symbols-outlined demo-page__library-item-icon">{ct.icon}</span>
-                        <span className="demo-page__library-item-name">{item.name}</span>
-                        <span className="field-label">{ct.label}</span>
-                      </button>
-                    )
-                  })}
-                  {filteredLibrary.length === 0 && (
-                    <div className="demo-page__library-empty">No matching items</div>
-                  )}
-                </div>
-              </div>
-            )}
+              )
+            })}
           </div>
+
+          <button
+            type="button"
+            className="demo-page__flow-create-btn"
+            onClick={() => onOpenFlowBuilder(name)}
+          >
+            <span className="material-symbols-outlined">account_tree</span>
+            Edit Flow to Add More Content
+          </button>
         </div>
       )}
 

@@ -48,4 +48,55 @@
       opacity: 0.5;
     }
   }
+
+  &__placeholder {
+    padding: 2.5rem 2rem;
+    border: var(--stroke) dashed var(--border);
+    border-radius: var(--radius);
+    max-width: 36rem;
+  }
+
+  &__placeholder-title {
+    margin: 0 0 0.75rem;
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    opacity: 0.85;
+  }
+
+  &__placeholder-body {
+    margin: 0;
+    line-height: 1.5;
+    opacity: 0.55;
+  }
+}
+
+// ——— Library (demos list) ———
+
+.library-page {
+  &__intro {
+    font-size: var(--font-size-base);
+    opacity: 0.55;
+    margin: 0.35rem 0 0;
+    max-width: 40rem;
+  }
+
+  &__status {
+    text-transform: capitalize;
+    opacity: 0.85;
+  }
+
+  &__demo-link {
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  &__thumb {
+    flex-shrink: 0;
+    width: 3.25rem;
+    aspect-ratio: 16 / 9;
+    border-radius: calc(var(--radius) * 0.55);
+    border: calc(var(--stroke) * 0.5) solid var(--border);
+    background: var(--muted);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
 }

@@ -1,4 +1,4 @@
-import { leadsData, type Lead } from "@/data/leads"
+import { allLeads, type Lead } from "@/data/leads"
 import Avatar from "@/components/Avatar"
 import ScoreBar from "@/components/ScoreBar"
 import CompanyLogo from "@/components/CompanyLogo"
@@ -9,10 +9,12 @@ interface BuyingGroupPageProps {
   groupName: string
   onBack: () => void
   onPersonClick: (lead: Lead) => void
+  /** Label for the back control (e.g. parent list page name). */
+  backLabel?: string
 }
 
-export default function BuyingGroupPage({ groupName, onBack, onPersonClick }: BuyingGroupPageProps) {
-  const members = leadsData
+export default function BuyingGroupPage({ groupName, onBack, onPersonClick, backLabel = "Back" }: BuyingGroupPageProps) {
+  const members = allLeads
     .filter((l) => l.company === groupName)
     .sort((a, b) => b.engagementScore - a.engagementScore)
 
@@ -42,7 +44,7 @@ export default function BuyingGroupPage({ groupName, onBack, onPersonClick }: Bu
     <div className="detail-page">
       <button className="detail-page__back" onClick={onBack}>
         <span className="material-symbols-outlined">arrow_back</span>
-        Track Engagement
+        {backLabel}
       </button>
 
       <div className="detail-page__header">

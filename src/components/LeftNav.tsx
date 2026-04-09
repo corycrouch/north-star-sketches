@@ -4,7 +4,10 @@ import Avatar from "@/components/Avatar"
 import "@/styles/left-nav.scss"
 
 interface NavItem {
-  icon: string
+  /** Material Symbols ligature name (omit when `customIconSrc` is set). */
+  icon?: string
+  /** Public URL for a custom nav icon (e.g. `/funnel_top.svg`). */
+  customIconSrc?: string
   label: string
   hasSubmenu?: boolean
   popout?: string
@@ -18,11 +21,9 @@ interface NavItemRowProps extends NavItem {
 
 const mainNav: NavItem[] = [
   { icon: "speed", label: "Dashboard" },
-  { icon: "add", label: "Create", hasSubmenu: true, popout: "create" },
-  { icon: "send", label: "Share", hasSubmenu: true, popout: "share" },
+  { customIconSrc: "/funnel_top.svg", label: "Lead Gen" },
+  { customIconSrc: "/funnel_bottom.svg", label: "Deals" },
   { icon: "note_stack", label: "Library" },
-  { icon: "trending_up", label: "Track Engagement" },
-  { icon: "link", label: "Manage Links" },
   { icon: "analytics", label: "Analytics" },
 ]
 
@@ -33,14 +34,18 @@ const bottomNav: NavItem[] = [
   { icon: "help", label: "Help", hasSubmenu: true },
 ]
 
-function NavItemRow({ icon, label, hasSubmenu, active, onClick, buttonRef }: NavItemRowProps) {
+function NavItemRow({ icon, customIconSrc, label, hasSubmenu, active, onClick, buttonRef }: NavItemRowProps) {
   return (
     <button
       ref={buttonRef}
       className={`left-nav__item ${active ? "left-nav__item--active" : ""}`}
       onClick={onClick}
     >
-      <span className="material-symbols-outlined left-nav__icon">{icon}</span>
+      {customIconSrc ? (
+        <img src={customIconSrc} alt="" className="left-nav__icon left-nav__icon--custom" />
+      ) : (
+        <span className="material-symbols-outlined left-nav__icon">{icon}</span>
+      )}
       <span className="left-nav__label">{label}</span>
       {hasSubmenu && (
         <span className="material-symbols-outlined left-nav__chevron">
@@ -56,6 +61,47 @@ interface PopoutProps {
   onClose: () => void
   onCreateDemo?: () => void
 }
+
+interface CreateMenuItem {
+  id: string
+  icon: string
+  title: string
+  description: string
+  /** Opens the demo editor when the row is activated */
+  opensDemo?: boolean
+}
+
+const CREATE_MENU_ITEMS: CreateMenuItem[] = [
+  {
+    id: "demo",
+    icon: "slideshow",
+    title: "Demo",
+    description:
+      "Build an interactive product demo your buyers can explore at their own pace. Choose from tours, videos, and more.",
+    opensDemo: true,
+  },
+  {
+    id: "ai-agent",
+    icon: "smart_toy",
+    title: "AI Agent",
+    description:
+      "Deploy an AI-powered agent that guides buyers through your product with personalized, conversational experiences.",
+  },
+  {
+    id: "share-link",
+    icon: "link",
+    title: "Share Link",
+    description:
+      "Create a reusable link that you can share anywhere. Or add specific recipients for a personalized touch.",
+  },
+  {
+    id: "page-embed",
+    icon: "code",
+    title: "Page Embed",
+    description:
+      "Embed your content directly into any website with a simple code snippet. Seamlessly integrate with your pages.",
+  },
+]
 
 function usePopoutPosition(anchorRef: React.RefObject<HTMLButtonElement | null>) {
   const anchorRect = anchorRef.current?.getBoundingClientRect()
@@ -88,87 +134,62 @@ function CreatePopout({ anchorRef, onClose, onCreateDemo }: PopoutProps) {
   const popoutRef = useRef<HTMLDivElement>(null)
   const pos = usePopoutPosition(anchorRef)
   useClickOutside(popoutRef, anchorRef, onClose)
+  const [hoveredId, setHoveredId] = useState("demo")
 
-  function handleDemoClick() {
+  const active = CREATE_MENU_ITEMS.find((item) => item.id === hoveredId) ?? CREATE_MENU_ITEMS[0]
+
+  function handleDemoLaunch() {
     onClose()
     onCreateDemo?.()
   }
 
-  return createPortal(
-    <div
-      className="share-popout"
-      ref={popoutRef}
-      style={{ top: pos.top, left: pos.left }}
-    >
-      <div className="share-popout__card share-popout__card--clickable" onClick={handleDemoClick} role="button" tabIndex={0}>
-        <div className="share-popout__card-header">
-          <span className="material-symbols-outlined share-popout__card-icon">slideshow</span>
-          <span className="share-popout__card-title">Demo</span>
-        </div>
-        <div className="share-popout__card-image" />
-        <p className="share-popout__card-desc">
-          Build an interactive product demo your buyers can explore at their own pace. Choose from tours, videos, and more.
-        </p>
-        <a href="#" className="share-popout__card-link" onClick={(e) => e.preventDefault()}>
-          See example
-        </a>
-      </div>
-
-      <div className="share-popout__card">
-        <div className="share-popout__card-header">
-          <span className="material-symbols-outlined share-popout__card-icon">smart_toy</span>
-          <span className="share-popout__card-title">AI Agent</span>
-        </div>
-        <div className="share-popout__card-image" />
-        <p className="share-popout__card-desc">
-          Deploy an AI-powered agent that guides buyers through your product with personalized, conversational experiences.
-        </p>
-        <a href="#" className="share-popout__card-link" onClick={(e) => e.preventDefault()}>
-          See example
-        </a>
-      </div>
-    </div>,
-    document.body,
-  )
-}
-
-function SharePopout({ anchorRef, onClose }: PopoutProps) {
-  const popoutRef = useRef<HTMLDivElement>(null)
-  const pos = usePopoutPosition(anchorRef)
-  useClickOutside(popoutRef, anchorRef, onClose)
+  function handleNavClick(item: CreateMenuItem) {
+    if (item.opensDemo) handleDemoLaunch()
+  }
 
   return createPortal(
     <div
-      className="share-popout"
+      className="create-popout"
       ref={popoutRef}
       style={{ top: pos.top, left: pos.left }}
     >
-      <div className="share-popout__card">
-        <div className="share-popout__card-header">
-          <span className="material-symbols-outlined share-popout__card-icon">link</span>
-          <span className="share-popout__card-title">Share Link</span>
-        </div>
-        <div className="share-popout__card-image" />
-        <p className="share-popout__card-desc">
-          Create a reusable link that you can share anywhere. Or add specific recipients for a personalized touch.
-        </p>
-        <a href="#" className="share-popout__card-link" onClick={(e) => e.preventDefault()}>
-          See example
-        </a>
-      </div>
+      <div className="create-popout__beak" aria-hidden />
+      <div className="create-popout__inner">
+        <nav className="create-popout__sidebar" aria-label="Create options">
+          <ul className="create-popout__nav-list">
+            {CREATE_MENU_ITEMS.map((item) => (
+              <li key={item.id}>
+                <button
+                  type="button"
+                  className={`create-popout__nav-item ${hoveredId === item.id ? "create-popout__nav-item--active" : ""} ${item.opensDemo ? "create-popout__nav-item--launch" : ""}`}
+                  onMouseEnter={() => setHoveredId(item.id)}
+                  onFocus={() => setHoveredId(item.id)}
+                  onClick={() => handleNavClick(item)}
+                >
+                  <span className="create-popout__nav-icon-wrap">
+                    <span className="material-symbols-outlined create-popout__nav-icon">{item.icon}</span>
+                  </span>
+                  <span className="create-popout__nav-label">{item.title}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-      <div className="share-popout__card">
-        <div className="share-popout__card-header">
-          <span className="material-symbols-outlined share-popout__card-icon">code</span>
-          <span className="share-popout__card-title">Page Embed</span>
+        <div className="create-popout__divider" aria-hidden />
+
+        <div className="create-popout__preview" aria-live="polite">
+          <h2 className="create-popout__preview-title">{active.title}</h2>
+          <div className="create-popout__preview-visual" />
+          <p className="create-popout__preview-desc">{active.description}</p>
+          <a
+            href="#"
+            className="create-popout__preview-link"
+            onClick={(e) => e.preventDefault()}
+          >
+            See example
+          </a>
         </div>
-        <div className="share-popout__card-image" />
-        <p className="share-popout__card-desc">
-          Embed your content directly into any website with a simple code snippet. Seamlessly integrate with your pages.
-        </p>
-        <a href="#" className="share-popout__card-link" onClick={(e) => e.preventDefault()}>
-          See example
-        </a>
       </div>
     </div>,
     document.body,
@@ -184,12 +205,6 @@ interface LeftNavProps {
 export default function LeftNav({ activePage, onNavigate, onCreateDemo }: LeftNavProps) {
   const [openPopout, setOpenPopout] = useState<string | null>(null)
   const createButtonRef = useRef<HTMLButtonElement>(null)
-  const shareButtonRef = useRef<HTMLButtonElement>(null)
-
-  const popoutRefs: Record<string, React.RefObject<HTMLButtonElement | null>> = {
-    create: createButtonRef,
-    share: shareButtonRef,
-  }
 
   const handleNav = useCallback((label: string, popout?: string) => {
     if (popout) {
@@ -200,10 +215,28 @@ export default function LeftNav({ activePage, onNavigate, onCreateDemo }: LeftNa
     }
   }, [onNavigate])
 
+  function toggleCreateMenu() {
+    setOpenPopout((prev) => (prev === "create" ? null : "create"))
+  }
+
   return (
     <nav className="left-nav">
       <div className="left-nav__logo">
         <img src="/Outline_Vertical_White.png" alt="Logo" className="left-nav__logo-img" />
+      </div>
+
+      <div className="left-nav__create-wrap">
+        <button
+          ref={createButtonRef}
+          type="button"
+          className={`left-nav__create-pill ${openPopout === "create" ? "left-nav__create-pill--open" : ""}`}
+          onClick={toggleCreateMenu}
+          aria-expanded={openPopout === "create"}
+          aria-haspopup="dialog"
+        >
+          <span className="material-symbols-outlined left-nav__create-pill-icon">add</span>
+          <span>Create</span>
+        </button>
       </div>
 
       <div className="left-nav__divider" />
@@ -213,9 +246,8 @@ export default function LeftNav({ activePage, onNavigate, onCreateDemo }: LeftNa
           <NavItemRow
             key={item.label}
             {...item}
-            active={activePage === item.label || (item.popout != null && openPopout === item.popout)}
+            active={activePage === item.label}
             onClick={() => handleNav(item.label, item.popout)}
-            buttonRef={item.popout ? popoutRefs[item.popout] : undefined}
           />
         ))}
       </div>
@@ -227,13 +259,6 @@ export default function LeftNav({ activePage, onNavigate, onCreateDemo }: LeftNa
           onCreateDemo={onCreateDemo}
         />
       )}
-      {openPopout === "share" && (
-        <SharePopout
-          anchorRef={shareButtonRef}
-          onClose={() => setOpenPopout(null)}
-        />
-      )}
-
       <div className="left-nav__spacer" />
       <div className="left-nav__divider" />
 
