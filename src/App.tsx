@@ -29,7 +29,7 @@ type Workspace =
   | "Sales"
 
 function App() {
-  const [workspace, setWorkspace] = useState<Workspace>("Marketing")
+  const [workspace, setWorkspace] = useState<Workspace>("Dashboard")
   const [marketingTab, setMarketingTab] = useState<AcquisitionTabId>("leads")
   const [salesTab, setSalesTab] = useState<PipelineTabId>("buyers")
   const [subPage, setSubPage] = useState<SubPage>({ type: "none" })

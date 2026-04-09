@@ -26,7 +26,6 @@ interface NavItemRowProps extends NavItem {
 }
 
 const mainNavRest: NavItem[] = [
-  { icon: "speed", label: "Dashboard" },
   { icon: "note_stack", label: "Library" },
   { icon: "analytics", label: "Analytics" },
 ]
@@ -286,7 +285,7 @@ export default function LeftNav({
   onSalesTabSelect,
 }: LeftNavProps) {
   const [openPopout, setOpenPopout] = useState<string | null>(null)
-  const [marketingOpen, setMarketingOpen] = useState(true)
+  const [marketingOpen, setMarketingOpen] = useState(false)
   const [salesOpen, setSalesOpen] = useState(false)
   const createButtonRef = useRef<HTMLButtonElement>(null)
 
