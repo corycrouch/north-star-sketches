@@ -27,7 +27,6 @@ interface NavItemRowProps extends NavItem {
 
 const mainNavRest: NavItem[] = [
   { icon: "note_stack", label: "Library" },
-  { icon: "analytics", label: "Analytics" },
 ]
 
 const bottomNav: NavItem[] = [
@@ -351,6 +350,12 @@ export default function LeftNav({
             label="Dashboard"
             active={workspace === "Dashboard"}
             onClick={() => handleNav("Dashboard")}
+          />
+          <NavItemRow
+            icon="analytics"
+            label="Analytics"
+            active={workspace === "Analytics"}
+            onClick={() => handleNav("Analytics")}
           />
           <NavAccordion
             label="Marketing"
