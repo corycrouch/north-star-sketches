@@ -1,4 +1,4 @@
-// North Star sketches — Vite + React entry
+// North Star sketches — Vite + React entrypoint
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
