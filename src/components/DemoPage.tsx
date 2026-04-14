@@ -1,7 +1,11 @@
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import CannedFlowGraphic, { getCannedFlowContentSummary } from "@/components/CannedFlowGraphic"
+import ChromeSharePickerMock from "@/components/ChromeSharePickerMock"
+import VideoRecordSetupModal from "@/components/VideoRecordSetupModal"
+import RecordingControlDock from "@/components/RecordingControlDock"
 import "@/styles/demo-page.scss"
+import "@/styles/video-record-setup.scss"
 
 interface ContentItem {
   id: string
@@ -40,6 +44,8 @@ interface DemoPageProps {
   /** Set when returning from Flow Builder with the canned sample flow on canvas */
   hasFlowPreview?: boolean
   onClearFlowPreview?: () => void
+  /** While fake screen-recording, parent can hide chrome (e.g. left nav). */
+  onFakeRecordingActiveChange?: (active: boolean) => void
 }
 
 let nextId = 100
@@ -62,6 +68,7 @@ export default function DemoPage({
   onOpenFlowBuilder,
   hasFlowPreview = false,
   onClearFlowPreview,
+  onFakeRecordingActiveChange,
 }: DemoPageProps) {
   const [name, setName] = useState(initialName)
   const [isEditing, setIsEditing] = useState(false)
@@ -76,12 +83,113 @@ export default function DemoPage({
   const [librarySearch, setLibrarySearch] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
 
+  /** Faked in-browser recorder (no real capture API). */
+  const [fakeVideoPhase, setFakeVideoPhase] = useState<
+    null | "intro" | "picking" | "recording" | "saving"
+  >(null)
+  const [fakeRecordSeconds, setFakeRecordSeconds] = useState(0)
+  /** Camera preview bubble; set on record setup, persists through share → REC → saving when on. */
+  const [recordCameraOn, setRecordCameraOn] = useState(true)
+  const [recordingPaused, setRecordingPaused] = useState(false)
+  const [sharePickerHost, setSharePickerHost] = useState("")
+  /** 3 → 2 → 1 on fake recording screen, then null = timer runs */
+  const [recordingCountdown, setRecordingCountdown] = useState<number | null>(null)
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const recordIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus()
       inputRef.current.select()
     }
   }, [isEditing])
+
+  function closeFakeVideoFlow() {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    if (recordIntervalRef.current) clearInterval(recordIntervalRef.current)
+    saveTimerRef.current = null
+    recordIntervalRef.current = null
+    setFakeVideoPhase(null)
+    setFakeRecordSeconds(0)
+    setRecordCameraOn(true)
+    setRecordingPaused(false)
+    setRecordingCountdown(null)
+  }
+
+  useEffect(() => {
+    setSharePickerHost(window.location.host)
+  }, [])
+
+  useEffect(() => {
+    const active = fakeVideoPhase === "recording"
+    onFakeRecordingActiveChange?.(active)
+    return () => {
+      if (active) onFakeRecordingActiveChange?.(false)
+    }
+  }, [fakeVideoPhase, onFakeRecordingActiveChange])
+
+  useEffect(() => {
+    if (
+      fakeVideoPhase !== "recording" ||
+      recordingPaused ||
+      recordingCountdown !== null
+    ) {
+      if (recordIntervalRef.current) {
+        clearInterval(recordIntervalRef.current)
+        recordIntervalRef.current = null
+      }
+      return
+    }
+    recordIntervalRef.current = setInterval(() => {
+      setFakeRecordSeconds((s) => s + 1)
+    }, 1000)
+    return () => {
+      if (recordIntervalRef.current) clearInterval(recordIntervalRef.current)
+    }
+  }, [fakeVideoPhase, recordingPaused, recordingCountdown])
+
+  useEffect(() => {
+    if (fakeVideoPhase !== "recording" || recordingCountdown === null) return
+    if (recordingCountdown <= 0) {
+      setRecordingCountdown(null)
+      return
+    }
+    const t = window.setTimeout(() => {
+      setRecordingCountdown((c) => {
+        if (c === null || c <= 1) return null
+        return c - 1
+      })
+    }, 1000)
+    return () => clearTimeout(t)
+  }, [fakeVideoPhase, recordingCountdown])
+
+  function confirmFakeShareAndRecord() {
+    setRecordingPaused(false)
+    setFakeVideoPhase("recording")
+    setFakeRecordSeconds(0)
+    setRecordingCountdown(3)
+  }
+
+  function finishFakeVideoRecording() {
+    if (recordIntervalRef.current) {
+      clearInterval(recordIntervalRef.current)
+      recordIntervalRef.current = null
+    }
+    setRecordingPaused(false)
+    setRecordingCountdown(null)
+    setFakeVideoPhase("saving")
+    saveTimerRef.current = setTimeout(() => {
+      setContentItems((prev) => [
+        ...prev,
+        { id: String(nextId++), type: "video", name: "Untitled Video" },
+      ])
+      saveTimerRef.current = null
+      setRecordingPaused(false)
+      setFakeVideoPhase(null)
+      setFakeRecordSeconds(0)
+      setRecordingCountdown(null)
+    }, 1300)
+  }
 
   function addContent(type: ContentItem["type"]) {
     const label = CONTENT_TYPES.find((t) => t.type === type)!.label
@@ -114,8 +222,14 @@ export default function DemoPage({
     item.name.toLowerCase().includes(librarySearch.toLowerCase())
   )
 
+  const showFakeRecordingTab = fakeVideoPhase === "recording"
+
   return (
-    <div className="demo-page">
+    <div
+      className={`demo-page${showFakeRecordingTab ? " demo-page--fake-recording" : ""}`}
+    >
+      {!showFakeRecordingTab && (
+        <>
       <button className="detail-page__back" onClick={onBack}>
         <span className="material-symbols-outlined">arrow_back</span>
         Back
@@ -233,7 +347,12 @@ export default function DemoPage({
               <button
                 key={ct.type}
                 className="demo-page__type-card"
-                onClick={() => addContent(ct.type)}
+                onClick={() => {
+                  if (ct.type === "video") {
+                    setRecordCameraOn(true)
+                    setFakeVideoPhase("intro")
+                  } else addContent(ct.type)
+                }}
               >
                 <span className="material-symbols-outlined demo-page__type-icon">{ct.icon}</span>
                 <span className="demo-page__type-label">{ct.label}</span>
@@ -322,7 +441,18 @@ export default function DemoPage({
             <div className="demo-page__single-preview">
               <div className="demo-page__single-preview-stage">
                 <div className="demo-page__single-preview-placeholder" />
-                <button className="demo-page__single-preview-play">
+                <button
+                  type="button"
+                  className="demo-page__single-preview-remove"
+                  onClick={() => removeContent(item.id)}
+                  aria-label="Remove video"
+                >
+                  <span className="demo-page__single-preview-remove-label">Remove</span>
+                  <span className="material-symbols-outlined" aria-hidden>
+                    close
+                  </span>
+                </button>
+                <button type="button" className="demo-page__single-preview-play">
                   <span className="material-symbols-outlined">play_arrow</span>
                 </button>
               </div>
@@ -334,13 +464,9 @@ export default function DemoPage({
                   </span>
                   <span className="demo-page__item-name">{item.name}</span>
                 </div>
-                <button
-                  className="demo-page__item-remove"
-                  onClick={() => removeContent(item.id)}
-                  title="Remove"
-                >
-                  <span className="material-symbols-outlined">close</span>
-                </button>
+                <span className="demo-page__item-more" aria-hidden="true">
+                  <span className="material-symbols-outlined">more_vert</span>
+                </span>
               </div>
             </div>
 
@@ -446,6 +572,115 @@ export default function DemoPage({
           </div>
         </div>
       </div>
+        </>
+      )}
+
+      {showFakeRecordingTab && (
+        <div
+          className="demo-page__fake-recording-blank"
+          role="region"
+          aria-label="Simulated shared screen"
+        >
+          <p className="demo-page__fake-recording-blank-text">screen recording here</p>
+        </div>
+      )}
+
+      {fakeVideoPhase && (
+        <>
+          {recordCameraOn && (
+            <div
+              className="record-setup__camera-pip"
+              role="img"
+              aria-label="Simulated camera self-view"
+            >
+              <div className="record-setup__camera-pip-surface">
+                <span className="material-symbols-outlined record-setup__camera-pip-icon" aria-hidden>
+                  person
+                </span>
+              </div>
+            </div>
+          )}
+
+          {fakeVideoPhase === "recording" && recordingCountdown === null && (
+            <RecordingControlDock
+              elapsedSeconds={fakeRecordSeconds}
+              paused={recordingPaused}
+              onPauseToggle={() => setRecordingPaused((p) => !p)}
+              onRestart={() => setFakeRecordSeconds(0)}
+              onSettings={() => {}}
+              onCancel={closeFakeVideoFlow}
+              onStop={finishFakeVideoRecording}
+            />
+          )}
+
+          {fakeVideoPhase === "recording" && recordingCountdown !== null && (
+            <div
+              className="demo-page__recording-countdown-backdrop"
+              role="status"
+              aria-live="assertive"
+              aria-atomic="true"
+            >
+              <span
+                key={recordingCountdown}
+                className="demo-page__recording-countdown-digit"
+              >
+                {recordingCountdown}
+              </span>
+            </div>
+          )}
+
+          {(fakeVideoPhase === "intro" ||
+            fakeVideoPhase === "picking" ||
+            fakeVideoPhase === "saving") && (
+            <div
+              className="demo-page__video-modal-backdrop"
+              role="presentation"
+              onClick={(e) => {
+                if (e.target === e.currentTarget && fakeVideoPhase === "intro") closeFakeVideoFlow()
+              }}
+            >
+              <div
+                className={`demo-page__video-modal ${fakeVideoPhase === "picking" ? "demo-page__video-modal--chrome" : ""} ${fakeVideoPhase === "intro" ? "demo-page__video-modal--record-setup" : ""}`}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={
+                  fakeVideoPhase === "picking" ? "demo-chrome-share-title" : "demo-fake-video-title"
+                }
+                onClick={(e) => e.stopPropagation()}
+              >
+                {fakeVideoPhase === "intro" && (
+                  <VideoRecordSetupModal
+                    cameraOn={recordCameraOn}
+                    onCameraOnChange={setRecordCameraOn}
+                    onCancel={closeFakeVideoFlow}
+                    onStartRecording={() => setFakeVideoPhase("picking")}
+                  />
+                )}
+
+                {fakeVideoPhase === "picking" && (
+                  <ChromeSharePickerMock
+                    hostOrigin={sharePickerHost}
+                    onCancel={closeFakeVideoFlow}
+                    onShare={confirmFakeShareAndRecord}
+                  />
+                )}
+
+                {fakeVideoPhase === "saving" && (
+                  <>
+                    <h2 id="demo-fake-video-title" className="demo-page__video-modal-title">
+                      Saving
+                    </h2>
+                    <p className="demo-page__video-modal-status" aria-live="polite">
+                      Saving your clip…
+                    </p>
+                    <div className="demo-page__video-modal-shimmer" aria-hidden />
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }

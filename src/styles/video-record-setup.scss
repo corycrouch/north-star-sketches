@@ -1,0 +1,270 @@
+/* Recording options step before share picker — blueprint / sketch tokens */
+
+.record-setup {
+  width: 100%;
+  max-width: 26rem;
+  margin-inline: auto;
+
+  &__visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  &__section {
+    margin-bottom: 1.25rem;
+
+    &:last-of-type {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    opacity: 0.85;
+
+    .material-symbols-outlined {
+      font-size: 1.45rem;
+    }
+  }
+
+  &__label {
+    flex: 1;
+    min-width: 0;
+    font-weight: 700;
+    font-size: var(--font-size-base);
+    letter-spacing: 0.02em;
+    color: var(--foreground);
+  }
+
+  &__toggle {
+    position: relative;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 1.5rem;
+    padding: 0;
+    border: calc(var(--stroke) * 0.5) solid var(--border);
+    border-radius: 9999px;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0.2rem;
+      width: 1.05rem;
+      height: 1.05rem;
+      border-radius: 50%;
+      background: var(--ring);
+      transform: translateY(-50%);
+      transition: transform 0.15s;
+    }
+
+    &[aria-checked="true"] {
+      background: oklch(0.99 0 0);
+      border-color: var(--border);
+
+      &::after {
+        transform: translate(1.15rem, -50%);
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
+    }
+  }
+
+  &__select-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  &__select-chevron {
+    position: absolute;
+    right: 0.55rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    opacity: 0.55;
+    display: flex;
+    align-items: center;
+
+    .material-symbols-outlined {
+      font-size: 1.35rem;
+    }
+  }
+
+  &__select {
+    width: 100%;
+    appearance: none;
+    font: inherit;
+    font-size: 0.95rem;
+    padding: 0.55rem 2.35rem 0.55rem 0.75rem;
+    border: calc(var(--stroke) * 0.5) solid var(--border);
+    border-radius: calc(var(--radius) * 0.75);
+    background: color-mix(in oklch, var(--foreground) 5%, transparent);
+    color: var(--foreground);
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 1px;
+    }
+
+    &--static {
+      display: block;
+      padding: 0.55rem 0.75rem;
+      cursor: default;
+      user-select: none;
+    }
+
+    &--muted {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  }
+
+  /* Viewport-fixed PiP — sits above modal overlay (z-index 200) */
+  &__camera-pip {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 250;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    pointer-events: none;
+    border: var(--stroke) solid var(--border);
+    box-shadow:
+      0 8px 28px color-mix(in oklch, var(--chart-5) 35%, transparent),
+      0 0 0 1px color-mix(in oklch, var(--foreground) 8%, transparent);
+  }
+
+  &__camera-pip-surface {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      155deg,
+      color-mix(in oklch, var(--ring) 38%, var(--foreground)) 0%,
+      color-mix(in oklch, var(--chart-2) 42%, var(--background)) 50%,
+      color-mix(in oklch, var(--accent) 50%, transparent) 100%
+    );
+  }
+
+  &__camera-pip-icon {
+    position: relative;
+    z-index: 1;
+    font-size: 4.5rem !important;
+    line-height: 1;
+    opacity: 0.65;
+    color: var(--foreground);
+    filter: drop-shadow(0 1px 2px color-mix(in oklch, var(--chart-5) 40%, transparent));
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  &__start {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    border: calc(var(--stroke) * 0.5) solid var(--border);
+    border-radius: 9999px;
+    font: inherit;
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    color: var(--foreground);
+    background: oklch(0.995 0 0);
+    transition: opacity 0.12s, filter 0.12s;
+
+    &:hover {
+      filter: brightness(0.97);
+      opacity: 0.94;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
+    }
+  }
+
+  &__start-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: calc(var(--stroke) * 0.65) solid currentColor;
+    border-radius: 50%;
+
+    &::after {
+      content: "";
+      width: 0.4rem;
+      height: 0.4rem;
+      border-radius: 50%;
+      background: currentColor;
+    }
+  }
+
+  &__cancel {
+    align-self: center;
+    padding: 0.35rem 0.75rem;
+    border: none;
+    background: none;
+    font: inherit;
+    font-size: 0.95rem;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    transition: color 0.12s;
+
+    &:hover {
+      color: var(--foreground);
+    }
+  }
+}
+
+[data-theme="blueprint"] .record-setup__start {
+  color: var(--primary-foreground);
+}

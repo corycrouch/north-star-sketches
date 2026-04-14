@@ -5,6 +5,7 @@ import "@/styles/track-engagement.scss"
 
 interface LibraryPageProps {
   onOpenDemo: (demo: DemoRecord) => void
+  onCreateDemo: () => void
 }
 
 function buildColumns(onOpenDemo: (demo: DemoRecord) => void): Column<DemoRecord>[] {
@@ -44,13 +45,23 @@ function buildColumns(onOpenDemo: (demo: DemoRecord) => void): Column<DemoRecord
   ]
 }
 
-export default function LibraryPage({ onOpenDemo }: LibraryPageProps) {
+export default function LibraryPage({ onOpenDemo, onCreateDemo }: LibraryPageProps) {
   const columns = buildColumns(onOpenDemo)
 
   return (
     <div className="track-engagement library-page">
-      <h1>Library</h1>
-      <p className="library-page__intro">Your demos live here. Open one to edit or preview.</p>
+      <header className="library-page__header">
+        <div className="library-page__header-main">
+          <h1>Library</h1>
+          <p className="library-page__intro">Your demos live here. Open one to edit or preview.</p>
+        </div>
+        <button type="button" className="library-page__create-btn" onClick={onCreateDemo}>
+          <span className="material-symbols-outlined" aria-hidden>
+            add
+          </span>
+          Create demo
+        </button>
+      </header>
 
       <div className="track-engagement__content">
         <SketchTable columns={columns} data={demosData} />

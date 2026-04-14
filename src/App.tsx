@@ -39,6 +39,8 @@ function App() {
     title: "",
   })
   const [demoHasFlowPreview, setDemoHasFlowPreview] = useState(false)
+  /** Demo fake screen-recording: full viewport, no left nav (simulated shared tab). */
+  const [demoFakeRecording, setDemoFakeRecording] = useState(false)
 
   function handleNavigate(page: string) {
     setSubPage({ type: "none" })
@@ -106,16 +108,20 @@ function App() {
   }
 
   return (
-    <div className="app-layout">
-      <LeftNav
-        workspace={workspace}
-        onNavigate={handleNavigate}
-        onCreateDemo={handleCreateDemo}
-        marketingTab={marketingTab}
-        salesTab={salesTab}
-        onMarketingTabSelect={selectMarketingTab}
-        onSalesTabSelect={selectSalesTab}
-      />
+    <div
+      className={`app-layout${demoFakeRecording ? " app-layout--demo-fake-recording" : ""}`}
+    >
+      {!demoFakeRecording && (
+        <LeftNav
+          workspace={workspace}
+          onNavigate={handleNavigate}
+          onCreateDemo={handleCreateDemo}
+          marketingTab={marketingTab}
+          salesTab={salesTab}
+          onMarketingTabSelect={selectMarketingTab}
+          onSalesTabSelect={selectSalesTab}
+        />
+      )}
       <main className="app-layout__content">
         {workspace === "Demo" && (
           <DemoPage
@@ -124,10 +130,11 @@ function App() {
             onOpenFlowBuilder={openFlowBuilder}
             hasFlowPreview={demoHasFlowPreview}
             onClearFlowPreview={() => setDemoHasFlowPreview(false)}
+            onFakeRecordingActiveChange={setDemoFakeRecording}
           />
         )}
         {workspace === "Library" && (
-          <LibraryPage onOpenDemo={openDemoFromLibrary} />
+          <LibraryPage onOpenDemo={openDemoFromLibrary} onCreateDemo={handleCreateDemo} />
         )}
         {workspace === "Dashboard" && <DashboardPage />}
         {(workspace === "Marketing" || workspace === "Sales") && subPage.type === "none" && (

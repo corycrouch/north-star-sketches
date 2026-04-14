@@ -32,6 +32,50 @@
 // ——— Library (demos list) ———
 
 .library-page {
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  &__header-main {
+    min-width: 0;
+  }
+
+  &__create-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.15rem;
+    padding: 0.45rem 1.1rem;
+    border: calc(var(--stroke) * 0.5) solid var(--border);
+    border-radius: var(--radius);
+    background: var(--foreground);
+    color: var(--background);
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.12s, border-color 0.12s;
+
+    .material-symbols-outlined {
+      font-size: 1.15rem;
+    }
+
+    &:hover {
+      opacity: 0.92;
+      border-color: var(--foreground);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
+    }
+  }
+
   &__intro {
     font-size: var(--font-size-base);
     opacity: 0.55;

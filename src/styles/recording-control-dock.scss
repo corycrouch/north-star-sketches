@@ -1,0 +1,198 @@
+/* Left-side floating recording control (prototype — no real capture). */
+
+.recording-dock {
+  position: fixed;
+  left: max(0.75rem, env(safe-area-inset-left, 0px));
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 250;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 5.5rem;
+  pointer-events: auto;
+}
+
+.recording-dock__drag {
+  display: grid;
+  grid-template-columns: repeat(2, 4px);
+  grid-template-rows: repeat(3, 4px);
+  gap: 3px;
+  padding: 0.15rem;
+  opacity: 0.45;
+}
+
+.recording-dock__drag-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--foreground) 45%, transparent);
+}
+
+.recording-dock__pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1rem 0.45rem 0.55rem;
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--chart-5) 88%, black);
+  border: calc(var(--stroke) * 0.35) solid color-mix(in oklch, var(--foreground) 18%, transparent);
+  box-shadow: 0 8px 28px color-mix(in oklch, black 35%, transparent);
+}
+
+.recording-dock__status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.15rem 0.15rem;
+  width: 100%;
+}
+
+.recording-dock__rec {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: oklch(0.97 0 0);
+  background: color-mix(in oklch, black 45%, transparent);
+}
+
+.recording-dock__rec-dot {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: recording-dock-rec-pulse 1.2s ease-in-out infinite;
+}
+
+.recording-dock__timer {
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: oklch(0.95 0 0);
+  opacity: 0.95;
+}
+
+.recording-dock__divider {
+  width: 70%;
+  height: 1px;
+  background: color-mix(in oklch, var(--foreground) 22%, transparent);
+  margin: 0.1rem 0;
+}
+
+.recording-dock__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: oklch(0.98 0 0);
+  cursor: pointer;
+  transition: background 0.12s, opacity 0.12s;
+
+  .material-symbols-outlined {
+    font-size: 1.35rem;
+    opacity: 0.92;
+  }
+
+  &:hover {
+    background: color-mix(in oklch, white 12%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  &--active {
+    background: color-mix(in oklch, white 15%, transparent);
+  }
+
+  &--ghost {
+    margin-top: 0.15rem;
+    opacity: 0.65;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.recording-dock__stop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.85rem;
+  height: 2.85rem;
+  margin: 0.15rem 0 0.1rem;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.12s;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+    border-radius: 50%;
+  }
+}
+
+.recording-dock__stop-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 2px solid oklch(0.98 0 0);
+  box-sizing: border-box;
+}
+
+.recording-dock__stop-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 50%;
+  background: #e85d3d;
+}
+
+.recording-dock__stop-square {
+  width: 0.45rem;
+  height: 0.45rem;
+  background: oklch(0.15 0 0);
+  border-radius: 1px;
+}
+
+@keyframes recording-dock-rec-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (max-width: 640px) {
+  .recording-dock {
+    max-width: 5rem;
+  }
+}
