@@ -464,9 +464,21 @@ export default function DemoPage({
                   </span>
                   <span className="demo-page__item-name">{item.name}</span>
                 </div>
-                <span className="demo-page__item-more" aria-hidden="true">
-                  <span className="material-symbols-outlined">more_vert</span>
-                </span>
+                <div className="demo-page__single-preview-actions">
+                  <button
+                    type="button"
+                    className="demo-page__item-edit"
+                    aria-label="Edit video"
+                  >
+                    <span className="material-symbols-outlined" aria-hidden>
+                      content_cut
+                    </span>
+                    Edit
+                  </button>
+                  <span className="demo-page__item-more" aria-hidden="true">
+                    <span className="material-symbols-outlined">more_vert</span>
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -479,7 +491,12 @@ export default function DemoPage({
                 <span className="material-symbols-outlined">account_tree</span>
                 Add more content
               </span>
-              <span className="demo-page__flow-create-trail">Build a Flow</span>
+              <span className="demo-page__flow-create-trail">
+                Build a Flow
+                <span className="material-symbols-outlined demo-page__flow-create-trail-arrow" aria-hidden>
+                  arrow_forward
+                </span>
+              </span>
             </button>
           </div>
         )

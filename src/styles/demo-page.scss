@@ -489,6 +489,50 @@
     gap: 0.75rem;
     padding: 0.75rem 1.25rem;
     border-top: calc(var(--stroke) * 0.5) solid var(--border);
+
+    > .demo-page__item-info {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
+  &__single-preview-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  &__item-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.55rem;
+    border: calc(var(--stroke) * 0.75) solid var(--border);
+    border-radius: var(--radius);
+    background: color-mix(in oklch, var(--card) 45%, transparent);
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    color: inherit;
+    transition: background 0.12s, border-color 0.12s;
+
+    .material-symbols-outlined {
+      font-size: 1.1rem;
+      opacity: 0.88;
+    }
+
+    &:hover {
+      background: color-mix(in oklch, var(--card) 72%, transparent);
+      border-color: color-mix(in oklch, var(--foreground) 16%, transparent);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
+    }
   }
 
   // ——— Content area (2+ items) ———
@@ -718,6 +762,11 @@
         font-size: 1.65rem;
         opacity: 0.72;
       }
+
+      .demo-page__flow-create-trail-arrow {
+        font-size: 1.2rem;
+        opacity: 0.65;
+      }
     }
   }
 
@@ -730,6 +779,9 @@
   }
 
   &__flow-create-trail {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
     flex-shrink: 0;
     white-space: nowrap;
   }
