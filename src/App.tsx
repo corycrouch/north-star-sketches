@@ -19,7 +19,7 @@ type SubPage =
   | { type: "buyingGroup"; name: string }
   | { type: "person"; lead: Lead }
 
-/** Main-area surface: Marketing/Sales are driven by nav sub-items (e.g. Leads, Buyers), not the accordion headers. */
+/** Main-area surface: Marketing/Sales are driven by nav sub-items (e.g. Viewers, Buyers), not the accordion headers. */
 type Workspace =
   | "Dashboard"
   | "Library"
@@ -30,7 +30,7 @@ type Workspace =
 
 function App() {
   const [workspace, setWorkspace] = useState<Workspace>("Dashboard")
-  const [marketingTab, setMarketingTab] = useState<AcquisitionTabId>("leads")
+  const [marketingTab, setMarketingTab] = useState<AcquisitionTabId>("viewers")
   const [salesTab, setSalesTab] = useState<PipelineTabId>("buyers")
   const [subPage, setSubPage] = useState<SubPage>({ type: "none" })
   const [demoName, setDemoName] = useState("")
