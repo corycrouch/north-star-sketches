@@ -174,7 +174,7 @@ function GroupSection<T>({ group, columns, onGroupHeaderClick }: {
                     href="#"
                     onClick={(e) => { e.preventDefault(); onGroupHeaderClick(group.label!) }}
                   >
-                    View Details
+                    View Account
                     <span className="material-symbols-outlined">arrow_forward</span>
                   </a>
                 )}

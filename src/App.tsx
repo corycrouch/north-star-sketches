@@ -152,6 +152,7 @@ function App() {
             onBack={goBack}
             onPersonClick={openPerson}
             backLabel={workspace === "Marketing" ? "Marketing" : "Sales"}
+            rollupSubtitle={workspace === "Sales" ? "Account" : "Company"}
           />
         )}
         {(workspace === "Marketing" || workspace === "Sales") && subPage.type === "person" && (
@@ -159,6 +160,7 @@ function App() {
             lead={subPage.lead}
             onBack={goBack}
             onBuyingGroupClick={openBuyingGroup}
+            rollupFieldLabel={workspace === "Sales" ? "Account" : "Company"}
           />
         )}
         {workspace === "Analytics" && (

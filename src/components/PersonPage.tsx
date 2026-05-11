@@ -8,9 +8,16 @@ interface PersonPageProps {
   lead: Lead
   onBack: () => void
   onBuyingGroupClick: (group: string) => void
+  /** Label for the linked company / account row (Marketing “Company” vs Sales “Account”). */
+  rollupFieldLabel?: string
 }
 
-export default function PersonPage({ lead, onBack, onBuyingGroupClick }: PersonPageProps) {
+export default function PersonPage({
+  lead,
+  onBack,
+  onBuyingGroupClick,
+  rollupFieldLabel = "Company",
+}: PersonPageProps) {
   const fullName = `${lead.firstName} ${lead.lastName}`
   const initials = `${lead.firstName[0]}${lead.lastName[0]}`
 
@@ -40,7 +47,7 @@ export default function PersonPage({ lead, onBack, onBuyingGroupClick }: PersonP
 
       <div className="detail-page__fields">
         <div className="detail-page__field">
-          <span className="field-label">Buying Group</span>
+          <span className="field-label">{rollupFieldLabel}</span>
           <a
             className="table-link"
             href="#"

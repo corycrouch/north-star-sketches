@@ -11,9 +11,17 @@ interface BuyingGroupPageProps {
   onPersonClick: (lead: Lead) => void
   /** Label for the back control (e.g. parent list page name). */
   backLabel?: string
+  /** Subtitle under the group title (matches Marketing “Company” vs Sales “Account”). */
+  rollupSubtitle?: string
 }
 
-export default function BuyingGroupPage({ groupName, onBack, onPersonClick, backLabel = "Back" }: BuyingGroupPageProps) {
+export default function BuyingGroupPage({
+  groupName,
+  onBack,
+  onPersonClick,
+  backLabel = "Back",
+  rollupSubtitle = "Company",
+}: BuyingGroupPageProps) {
   const members = allLeads
     .filter((l) => l.company === groupName)
     .sort((a, b) => b.engagementScore - a.engagementScore)
@@ -51,7 +59,7 @@ export default function BuyingGroupPage({ groupName, onBack, onPersonClick, back
         <CompanyLogo domain={domain} size={40} card />
         <div>
           <h1>{groupName}</h1>
-          <span className="detail-page__subtitle">Buying Group</span>
+          <span className="detail-page__subtitle">{rollupSubtitle}</span>
         </div>
       </div>
 

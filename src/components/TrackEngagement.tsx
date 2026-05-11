@@ -6,6 +6,29 @@ import Avatar from "@/components/Avatar"
 import CompanyLogo from "@/components/CompanyLogo"
 import "@/styles/track-engagement.scss"
 
+function formatLastActivity(iso: string): string {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return "—"
+
+  const now = new Date()
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
+  const startOfThatDay = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
+  const dayDiff = Math.round((startOfToday - startOfThatDay) / 86_400_000)
+
+  const timeStr = d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })
+
+  if (dayDiff < 0) {
+    return `${d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })} · ${timeStr}`
+  }
+  if (dayDiff === 0) return `Today · ${timeStr}`
+  if (dayDiff === 1) return `Yesterday · ${timeStr}`
+  if (dayDiff >= 2 && dayDiff < 7) {
+    const weekday = d.toLocaleDateString(undefined, { weekday: "long" })
+    return `${weekday} · ${timeStr}`
+  }
+  return `${d.toLocaleDateString(undefined, { month: "short", day: "numeric" })} · ${timeStr}`
+}
+
 export type TrackEngagementView = "acquisition" | "pipeline"
 
 interface TrackEngagementProps {
@@ -17,7 +40,7 @@ interface TrackEngagementProps {
 }
 
 export const ACQUISITION_TABS = [
-  { id: "viewers", label: "Viewers" },
+  { id: "viewers", label: "Track Viewers" },
   { id: "links-embeds", label: "Links & Embeds" },
   { id: "campaigns", label: "Campaigns" },
   { id: "viewer-journeys", label: "Viewer journeys" },
@@ -27,7 +50,7 @@ export const ACQUISITION_TABS = [
 ] as const
 
 export const PIPELINE_TABS = [
-  { id: "buyers", label: "Buyers" },
+  { id: "buyers", label: "Track Viewers" },
   { id: "deal-links", label: "Links" },
 ] as const
 
@@ -51,7 +74,7 @@ function buildColumns(
 
   const companyColumn: GroupedTableColumn<Lead> = {
     key: "company",
-    header: isAcquisition ? "Company" : "Buying Group",
+    header: isAcquisition ? "Company" : "Account",
     render: (row) =>
       isAcquisition ? (
         <span className="table-company-cell">
@@ -72,19 +95,27 @@ function buildColumns(
   }
 
   const cols: GroupedTableColumn<Lead>[] = [
-    { key: "name", header: "Name", render: (row) => (
-      <a
-        className="table-link name-cell"
-        href="#"
-        onClick={(e) => { e.preventDefault(); onPersonClick(row) }}
-      >
-        <Avatar initials={`${row.firstName[0]}${row.lastName[0]}`} />
-        {row.firstName} {row.lastName}
-        <span className="material-symbols-outlined table-link__icon">arrow_forward</span>
-      </a>
-    ) },
+    {
+      key: "name",
+      header: "Name",
+      render: (row) => (
+        <a
+          className="table-link name-cell name-cell--with-role"
+          href="#"
+          onClick={(e) => { e.preventDefault(); onPersonClick(row) }}
+        >
+          <Avatar initials={`${row.firstName[0]}${row.lastName[0]}`} />
+          <span className="name-cell__text">
+            <span className="name-cell__name">
+              {row.firstName} {row.lastName}
+              <span className="material-symbols-outlined table-link__icon">arrow_forward</span>
+            </span>
+            <span className="name-cell__role">{row.role}</span>
+          </span>
+        </a>
+      ),
+    },
     companyColumn,
-    { key: "role", header: "Role", render: (row) => row.role },
   ]
 
   if (isAcquisition) {
@@ -93,14 +124,27 @@ function buildColumns(
       header: "Email",
       render: (row) => <span className="table-email-cell">{row.email}</span>,
     })
+    cols.push({
+      key: "lastActivityAt",
+      header: "Last activity",
+      render: (row) => (
+        <span className="table-last-activity-cell">{formatLastActivity(row.lastActivityAt)}</span>
+      ),
+    })
   }
 
   if (!isAcquisition) {
-    cols.push({ key: "account", header: "Account", render: (row) => row.account })
     cols.push({
       key: "opportunity",
       header: "Opportunity",
       render: (row) => row.opportunity,
+    })
+    cols.push({
+      key: "lastActivityAt",
+      header: "Last activity",
+      render: (row) => (
+        <span className="table-last-activity-cell">{formatLastActivity(row.lastActivityAt)}</span>
+      ),
     })
   }
 
@@ -115,17 +159,18 @@ function buildColumns(
 const sortOptionsAll = [
   { key: "engagementScore", label: "Engagement" },
   { key: "name", label: "Name" },
-  { key: "company", label: "Buying Group" },
+  { key: "company", label: "Account" },
   { key: "role", label: "Role" },
-  { key: "account", label: "Account" },
+  { key: "lastActivityAt", label: "Last activity" },
   { key: "opportunity", label: "Opportunity" },
 ]
 
 const acquisitionSortOptions = [
   ...sortOptionsAll
-    .filter((o) => o.key !== "opportunity" && o.key !== "account")
+    .filter((o) => o.key !== "opportunity" && o.key !== "lastActivityAt")
     .map((o) => (o.key === "company" ? { ...o, label: "Company" } : o)),
   { key: "email", label: "Email" },
+  { key: "lastActivityAt", label: "Last activity" },
 ]
 
 const acquisitionGroupOptions = [
@@ -135,7 +180,7 @@ const acquisitionGroupOptions = [
 
 const pipelineGroupOptions = [
   { key: "individual", label: "Individual" },
-  { key: "company", label: "Buying Group" },
+  { key: "company", label: "Account" },
 ]
 
 function getSortValue(row: Lead, field: string): string | number {
@@ -145,6 +190,7 @@ function getSortValue(row: Lead, field: string): string | number {
     case "company": return row.company
     case "role": return row.role
     case "email": return row.email
+    case "lastActivityAt": return row.lastActivityAt
     case "account": return row.account
     case "opportunity": return row.opportunity
     default: return ""
@@ -188,12 +234,9 @@ export default function TrackEngagement({
 
   const isAcquisition = view === "acquisition"
 
-  const pageTitle =
-    isAcquisition && acquisitionTab === "viewers"
-      ? "Viewers"
-      : isAcquisition
-        ? ACQUISITION_TABS.find((t) => t.id === acquisitionTab)?.label ?? "Viewers"
-        : PIPELINE_TABS.find((t) => t.id === pipelineTab)?.label ?? "Buyers"
+  const pageTitle = isAcquisition
+    ? ACQUISITION_TABS.find((t) => t.id === acquisitionTab)?.label ?? "Track Viewers"
+    : PIPELINE_TABS.find((t) => t.id === pipelineTab)?.label ?? "Track Viewers"
 
   return (
     <div className="track-engagement">

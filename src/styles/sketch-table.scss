@@ -88,11 +88,43 @@
   white-space: nowrap;
 }
 
+.table-last-activity-cell {
+  font-size: 0.92em;
+  opacity: 0.88;
+  white-space: nowrap;
+}
+
 /* ——— Name cell with avatar ——— */
 .name-cell {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
+}
+
+.name-cell--with-role {
+  align-items: flex-start;
+}
+
+.name-cell__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.name-cell__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.name-cell__role {
+  font-size: 0.82em;
+  font-weight: 400;
+  opacity: 0.62;
+  line-height: 1.25;
+  max-width: 18rem;
 }
 
 /* ——— Score bar (reusable) ——— */
