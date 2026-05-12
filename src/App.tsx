@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { Lead } from "@/data/leads"
 import LeftNav from "@/components/LeftNav"
 import TrackEngagement, {
@@ -11,8 +11,18 @@ import DemoPage from "@/components/DemoPage"
 import FlowBuilderPage from "@/components/FlowBuilderPage"
 import LibraryPage from "@/components/LibraryPage"
 import DashboardPage from "@/components/DashboardPage"
+import ClaudeBuyerPage from "@/components/ClaudeBuyerPage"
+import DemoRoomPage from "@/components/DemoRoomPage"
 import type { DemoRecord } from "@/data/demos"
 import "@/styles/app.scss"
+
+/**
+ * Hash-based routes for standalone surfaces (pages that should NOT show
+ * the main app's left nav — e.g. a prospective buyer's view of Claude
+ * or the demo room they land on after clicking a demo link).
+ */
+const CLAUDE_BUYER_HASH = "#/claude-demo"
+const DEMO_ROOM_HASH = "#/demo-room"
 
 type SubPage =
   | { type: "none" }
@@ -29,6 +39,13 @@ type Workspace =
   | "Sales"
 
 function App() {
+  const [route, setRoute] = useState<string>(() => window.location.hash)
+  useEffect(() => {
+    const onHashChange = () => setRoute(window.location.hash)
+    window.addEventListener("hashchange", onHashChange)
+    return () => window.removeEventListener("hashchange", onHashChange)
+  }, [])
+
   const [workspace, setWorkspace] = useState<Workspace>("Dashboard")
   const [marketingTab, setMarketingTab] = useState<AcquisitionTabId>("viewers")
   const [salesTab, setSalesTab] = useState<PipelineTabId>("buyers")
@@ -99,6 +116,20 @@ function App() {
     setDemoName(demo.name)
     setDemoHasFlowPreview(false)
     setWorkspace("Demo")
+  }
+
+  if (route === DEMO_ROOM_HASH) {
+    return <DemoRoomPage />
+  }
+
+  if (route === CLAUDE_BUYER_HASH) {
+    return (
+      <ClaudeBuyerPage
+        onOpenFullDemo={() => {
+          window.location.hash = DEMO_ROOM_HASH
+        }}
+      />
+    )
   }
 
   if (flowBuilder.open) {

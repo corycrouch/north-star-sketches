@@ -1,0 +1,705 @@
+.claude-buyer-page {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: row;
+  font-size: var(--font-size-base);
+}
+
+/* ——————————————————————— Fake Claude left nav ——————————————————————— */
+
+.claude-nav {
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  flex-shrink: 0;
+  width: 17rem;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 0.75rem 0.7rem 0.6rem;
+  border-right: var(--stroke) solid var(--border);
+  background: var(--plane);
+  backdrop-filter: blur(var(--plane-blur));
+  font-size: 1rem;
+}
+
+.claude-nav__brand {
+  padding: 0.5rem 0.6rem 0.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.claude-nav__tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.25rem;
+  border-radius: calc(var(--radius) * 1.4);
+  background: color-mix(in oklch, black 18%, transparent);
+}
+
+.claude-nav__tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.5rem;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.95rem;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: background 0.12s, opacity 0.12s;
+
+  &--active {
+    opacity: 1;
+    background: color-mix(in oklch, var(--foreground) 14%, transparent);
+  }
+
+  &:hover:not(&--active) {
+    opacity: 1;
+  }
+
+  .material-symbols-outlined {
+    font-size: 1.05rem;
+  }
+}
+
+.claude-nav__menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.claude-nav__menu-item {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.45rem 0.6rem;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.92;
+  transition: background 0.12s;
+
+  &:hover {
+    background: color-mix(in oklch, var(--foreground) 8%, transparent);
+  }
+
+  .material-symbols-outlined {
+    font-size: 1.2rem;
+    opacity: 0.85;
+  }
+}
+
+.claude-nav__recents {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.claude-nav__section-label {
+  margin: 0.5rem 0 0.15rem 0.6rem;
+  font-size: 0.85rem;
+  opacity: 0.55;
+  letter-spacing: 0.02em;
+}
+
+.claude-nav__recents-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.claude-nav__recent {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.85;
+  transition: background 0.12s, opacity 0.12s;
+
+  &:hover {
+    opacity: 1;
+    background: color-mix(in oklch, var(--foreground) 6%, transparent);
+  }
+
+  &--active {
+    opacity: 1;
+    background: color-mix(in oklch, var(--foreground) 14%, transparent);
+  }
+}
+
+/**
+ * Reusable rounded placeholder rectangle used in place of content text.
+ * Sizes are tuned per-context with modifier classes.
+ */
+.claude-nav__rect {
+  display: block;
+  height: 0.7rem;
+  width: 100%;
+  border-radius: 0.35rem;
+  background: color-mix(in oklch, var(--foreground) 22%, transparent);
+
+  &--sm {
+    height: 0.6rem;
+    width: 7rem;
+  }
+
+  &--xs {
+    height: 0.5rem;
+    width: 3.5rem;
+  }
+}
+
+.claude-nav__spacer {
+  flex: 1;
+}
+
+.claude-nav__user {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.5rem 0.4rem;
+  margin-top: 0.1rem;
+}
+
+.claude-nav__user-avatar {
+  flex-shrink: 0;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 50%;
+  background: var(--border);
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.claude-nav__user-trailing {
+  margin-left: auto;
+  font-size: 1.15rem !important;
+  opacity: 0.75;
+}
+
+.claude-buyer-page__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.claude-buyer-page__shell {
+  width: 100%;
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.claude-buyer-page__conversation {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.claude-buyer-page__message {
+  display: flex;
+
+  &--user {
+    justify-content: flex-end;
+  }
+
+  &--claude {
+    justify-content: flex-start;
+  }
+}
+
+.claude-buyer-page__bubble {
+  max-width: 80%;
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--radius);
+  border-top-right-radius: 0;
+  background: var(--accent);
+  line-height: 1.4;
+}
+
+.claude-buyer-page__claude-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.claude-buyer-page__text {
+  margin: 0;
+  line-height: 1.45;
+}
+
+/**
+ * Inline text link used by the Near conversation. Underlined, color
+ * inherited from the surrounding prose so it reads as part of the answer.
+ */
+.claude-buyer-page__source-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  cursor: pointer;
+  transition: opacity 0.12s;
+
+  &:hover {
+    opacity: 0.78;
+  }
+}
+
+/* —————————————————————————— Demo card —————————————————————————— */
+
+.demo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.1rem 1.25rem 1.25rem;
+  border: var(--stroke) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--plane);
+  backdrop-filter: blur(var(--plane-blur));
+}
+
+.demo-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.demo-card__source {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.demo-card__source-logo {
+  flex-shrink: 0;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 50%;
+  border: var(--stroke) solid var(--border);
+  background: var(--plane);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.demo-card__source-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem;
+  min-width: 0;
+  font-size: 0.95rem;
+  opacity: 0.78;
+}
+
+.demo-card__source-name {
+  font-weight: 700;
+  opacity: 1;
+}
+
+.demo-card__source-sep {
+  opacity: 0.5;
+}
+
+.demo-card__badge {
+  flex-shrink: 0;
+  padding: 0.15rem 0.65rem;
+  border: var(--stroke) solid var(--border);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  background: transparent;
+}
+
+.demo-card__title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+.demo-card__meta {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.55;
+}
+
+.demo-card__preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0;
+  padding: 0;
+  border: var(--stroke) dashed var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.15s;
+
+  &:hover {
+    background: color-mix(in oklch, var(--foreground) 8%, transparent);
+  }
+}
+
+.demo-card__preview-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.35;
+}
+
+.demo-card__preview-caption {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius);
+  background: color-mix(in oklch, var(--background) 60%, transparent);
+  font-size: 0.85rem;
+  opacity: 0.85;
+
+  .material-symbols-outlined {
+    font-size: 1rem;
+  }
+}
+
+.demo-card__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.demo-card__section-label {
+  /* leans on global `.field-label`; kept for future overrides */
+}
+
+.demo-card__summary {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.demo-card__tags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.demo-card__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.85rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--border);
+  font-size: 0.95rem;
+  line-height: 1.3;
+
+  .material-symbols-outlined {
+    font-size: 1.05rem;
+    opacity: 0.7;
+  }
+}
+
+.demo-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.demo-card__stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.demo-card__stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.95rem;
+  opacity: 0.75;
+
+  .material-symbols-outlined {
+    font-size: 1.1rem;
+  }
+}
+
+.demo-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.1rem;
+  border: var(--stroke) solid var(--primary);
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font: inherit;
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: transform 0.12s, filter 0.12s;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+  }
+
+  .material-symbols-outlined {
+    font-size: 1.3rem;
+  }
+}
+
+/* ————————————————————— Suggested follow-ups ————————————————————— */
+
+.claude-buyer-page__suggestions {
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.claude-buyer-page__suggestion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.95rem;
+  border: var(--stroke) solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.12s;
+
+  &:hover {
+    background: color-mix(in oklch, var(--foreground) 8%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .material-symbols-outlined {
+    font-size: 1rem;
+    opacity: 0.7;
+  }
+}
+
+/* ————————————————————— Message feedback row ———————————————————— */
+
+.claude-buyer-page__feedback {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.claude-buyer-page__feedback-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.12s, background 0.12s;
+
+  &:hover {
+    opacity: 1;
+    background: color-mix(in oklch, var(--foreground) 8%, transparent);
+  }
+
+  .material-symbols-outlined {
+    font-size: 1.2rem;
+  }
+}
+
+/* ———————————————————————— Sticky composer ———————————————————————— */
+
+/**
+ * Full-width footer that pins to the viewport bottom. Solid page-color bg
+ * so scrolling content can't bleed through above OR below the composer.
+ */
+.claude-buyer-page__composer-wrap {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin-top: auto; /* pushes the bar to the bottom if content is short */
+  padding: 0 1.5rem 0.85rem;
+  /**
+   * Match the page background exactly: solid `--background` color + the
+   * paper texture multiplied on top, mirroring the body's setup in
+   * `src/index.css`. `background-attachment: fixed` keeps the tile
+   * pattern aligned with the rest of the page so there's no seam.
+   */
+  background-color: var(--background);
+  background-image: url("/Paper-Tile-2.png");
+  background-repeat: repeat;
+  background-size: 64px 64px;
+  background-attachment: fixed;
+  background-blend-mode: multiply;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.claude-buyer-page__composer {
+  width: 100%;
+  max-width: 56rem; /* intentionally wider than the conversation column */
+  padding: 0.85rem 1rem 0.65rem;
+  border: var(--stroke) solid var(--border);
+  border-radius: calc(var(--radius) * 1.6);
+  background: var(--plane);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.claude-buyer-page__disclaimer {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.45;
+  text-align: center;
+}
+
+.claude-buyer-page__composer-placeholder {
+  padding: 0.4rem 0.25rem 0.2rem;
+  font-size: var(--font-size-base);
+  opacity: 0.45;
+}
+
+.claude-buyer-page__composer-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.claude-buyer-page__composer-spacer {
+  flex: 1;
+}
+
+.claude-buyer-page__composer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border: var(--stroke) solid var(--border);
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.12s, background 0.12s;
+
+  &:hover {
+    opacity: 1;
+    background: color-mix(in oklch, var(--foreground) 8%, transparent);
+  }
+
+  .material-symbols-outlined {
+    font-size: 1.3rem;
+  }
+}
+
+.claude-buyer-page__composer-model {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  opacity: 0.78;
+  border-radius: var(--radius);
+  transition: opacity 0.12s, background 0.12s;
+
+  &:hover {
+    opacity: 1;
+    background: color-mix(in oklch, var(--foreground) 8%, transparent);
+  }
+
+  .material-symbols-outlined {
+    font-size: 1.2rem;
+  }
+}
