@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react"
 import CannedFlowGraphic from "@/components/CannedFlowGraphic"
+import { DEMO_CONTENT_META, type DemoContentItem } from "@/types/demo-content"
 import "@/styles/flow-builder.scss"
 
 export interface FlowBuilderCloseResult {
@@ -8,11 +9,17 @@ export interface FlowBuilderCloseResult {
 
 interface FlowBuilderPageProps {
   demoTitle: string
+  seedContent?: DemoContentItem[]
   onClose: (result: FlowBuilderCloseResult) => void
 }
 
-export default function FlowBuilderPage({ demoTitle, onClose }: FlowBuilderPageProps) {
+export default function FlowBuilderPage({
+  demoTitle,
+  seedContent = [],
+  onClose,
+}: FlowBuilderPageProps) {
   const [showCannedFlow, setShowCannedFlow] = useState(false)
+  const hasSeedContent = seedContent.length > 0
 
   const seedCannedFlow = useCallback(() => {
     setShowCannedFlow(true)
@@ -21,6 +28,15 @@ export default function FlowBuilderPage({ demoTitle, onClose }: FlowBuilderPageP
   const finish = useCallback(() => {
     onClose({ hasCannedFlow: showCannedFlow })
   }, [onClose, showCannedFlow])
+
+  const canvasClass = [
+    "flow-builder__canvas-inner",
+    showCannedFlow
+      ? "flow-builder__canvas-inner--has-flow"
+      : hasSeedContent
+        ? "flow-builder__canvas-inner--has-seed"
+        : "flow-builder__canvas-inner--empty",
+  ].join(" ")
 
   return (
     <div className="flow-builder">
@@ -50,23 +66,57 @@ export default function FlowBuilderPage({ demoTitle, onClose }: FlowBuilderPageP
       <div className="flow-builder__body">
         <div className="flow-builder__canvas" aria-label="Flow canvas">
           <div
-            className={`flow-builder__canvas-inner ${showCannedFlow ? "flow-builder__canvas-inner--has-flow" : "flow-builder__canvas-inner--empty"}`}
-            onClick={seedCannedFlow}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault()
-                seedCannedFlow()
-              }
-            }}
-            role={showCannedFlow ? undefined : "button"}
-            tabIndex={showCannedFlow ? undefined : 0}
-            aria-label={showCannedFlow ? undefined : "Add a sample flow to the canvas"}
+            className={canvasClass}
+            onClick={!hasSeedContent && !showCannedFlow ? seedCannedFlow : undefined}
+            onKeyDown={
+              !hasSeedContent && !showCannedFlow
+                ? (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault()
+                      seedCannedFlow()
+                    }
+                  }
+                : undefined
+            }
+            role={!hasSeedContent && !showCannedFlow ? "button" : undefined}
+            tabIndex={!hasSeedContent && !showCannedFlow ? 0 : undefined}
+            aria-label={
+              !hasSeedContent && !showCannedFlow
+                ? "Add a sample flow to the canvas"
+                : undefined
+            }
           >
-            {!showCannedFlow && (
+            {!showCannedFlow && !hasSeedContent && (
               <>
                 <span className="material-symbols-outlined flow-builder__canvas-icon">account_tree</span>
                 <p className="flow-builder__canvas-hint">Drag steps here to build your flow</p>
               </>
+            )}
+            {!showCannedFlow && hasSeedContent && (
+              <div className="flow-builder__seed-content">
+                {seedContent.map((item, index) => {
+                  const meta = DEMO_CONTENT_META[item.type]
+                  return (
+                    <div
+                      key={`${item.type}-${item.name}-${index}`}
+                      className="flow-builder__seed-card"
+                    >
+                      <div className="flow-builder__seed-card-thumb" aria-hidden>
+                        <span className="material-symbols-outlined">play_arrow</span>
+                      </div>
+                      <div className="flow-builder__seed-card-meta">
+                        <span className="field-label flow-builder__seed-card-type">
+                          <span className="material-symbols-outlined" aria-hidden>
+                            {meta.icon}
+                          </span>
+                          {meta.label}
+                        </span>
+                        <span className="flow-builder__seed-card-name">{item.name}</span>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             )}
             {showCannedFlow && (
               <div className="flow-builder__canned-flow">
@@ -114,8 +164,23 @@ export default function FlowBuilderPage({ demoTitle, onClose }: FlowBuilderPageP
               />
             </div>
             <div className="flow-builder__content-cards">
-              {Array.from({ length: 10 }, (_, i) => (
-                <div key={i} className="flow-builder__content-card" aria-hidden />
+              {seedContent.map((item, index) => {
+                const meta = DEMO_CONTENT_META[item.type]
+                return (
+                  <div
+                    key={`${item.type}-${item.name}-${index}`}
+                    className="flow-builder__content-card flow-builder__content-card--filled"
+                  >
+                    <span className="material-symbols-outlined flow-builder__content-card-icon" aria-hidden>
+                      {meta.icon}
+                    </span>
+                    <span className="flow-builder__content-card-label">{meta.label}</span>
+                    <span className="flow-builder__content-card-name">{item.name}</span>
+                  </div>
+                )
+              })}
+              {Array.from({ length: Math.max(0, 10 - seedContent.length) }, (_, i) => (
+                <div key={`placeholder-${i}`} className="flow-builder__content-card" aria-hidden />
               ))}
             </div>
           </section>

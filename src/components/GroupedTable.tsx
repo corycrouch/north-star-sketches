@@ -8,6 +8,17 @@ interface FieldOption {
   label: string
 }
 
+export interface GroupedTableQuickFilter {
+  label: string
+  icon: string
+}
+
+const DEFAULT_QUICK_FILTERS: GroupedTableQuickFilter[] = [
+  { label: "Account", icon: "business" },
+  { label: "Role", icon: "work" },
+  { label: "Columns", icon: "view_column" },
+]
+
 export interface GroupedTableColumn<T> {
   key: string
   header: string
@@ -27,6 +38,9 @@ interface GroupedTableProps<T> {
   getGroupValue: (row: T, field: string) => string
   onGroupHeaderClick?: (label: string) => void
   filterCount?: number
+  quickFilters?: GroupedTableQuickFilter[]
+  viewByFlatIcon?: string
+  viewByGroupedIcon?: string
 }
 
 export default function GroupedTable<T>({
@@ -42,6 +56,9 @@ export default function GroupedTable<T>({
   getGroupValue,
   onGroupHeaderClick,
   filterCount = 0,
+  quickFilters = DEFAULT_QUICK_FILTERS,
+  viewByFlatIcon = "person",
+  viewByGroupedIcon = "workspaces",
 }: GroupedTableProps<T>) {
   /** First option = flat list (no group headers); second = group by that field key. */
   const flatViewKey = groupOptions[0]?.key ?? "individual"
@@ -101,18 +118,12 @@ export default function GroupedTable<T>({
           )}
         </button>
         <span className="grouped-table__divider" />
-        <button className="grouped-table__fake-btn">
-          <span className="material-symbols-outlined grouped-table__fake-btn-icon">business</span>
-          Account
-        </button>
-        <button className="grouped-table__fake-btn">
-          <span className="material-symbols-outlined grouped-table__fake-btn-icon">work</span>
-          Role
-        </button>
-        <button className="grouped-table__fake-btn">
-          <span className="material-symbols-outlined grouped-table__fake-btn-icon">view_column</span>
-          Columns
-        </button>
+        {quickFilters.map((filter) => (
+          <button key={filter.label} type="button" className="grouped-table__fake-btn">
+            <span className="material-symbols-outlined grouped-table__fake-btn-icon">{filter.icon}</span>
+            {filter.label}
+          </button>
+        ))}
         <DropdownButton
           icon="format_line_spacing"
           label="Sort by"
@@ -121,7 +132,7 @@ export default function GroupedTable<T>({
           onChange={onSortChange}
         />
         <DropdownButton
-          icon={groupBy === groupedFieldKey ? "workspaces" : "person"}
+          icon={groupBy === groupedFieldKey ? viewByGroupedIcon : viewByFlatIcon}
           label="View by"
           options={groupOptions}
           value={groupBy ? groupedFieldKey : flatViewKey}

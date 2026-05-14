@@ -259,7 +259,7 @@
     grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
     width: 100%;
-    max-width: 560px;
+    max-width: 44rem;
   }
 
   &__type-card {
@@ -267,7 +267,7 @@
     flex-direction: column;
     align-items: center;
     gap: 0.6rem;
-    padding: 1.5rem 1rem;
+    padding: 1.5rem 0.85rem;
     border: var(--stroke) solid var(--border);
     border-radius: var(--radius);
     background: var(--plane);
@@ -291,6 +291,7 @@
   &__type-label {
     font-size: 0.95rem;
     opacity: 0.8;
+    white-space: nowrap;
   }
 
   &__library-choose {

@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { leadsData, pipelineData, type Lead } from "@/data/leads"
+import { salesAccountsData, type AccountRecord } from "@/data/accounts"
+import { marketingLinksData, salesLinksData, type MarketingLink, type SalesLink } from "@/data/links"
 import GroupedTable, { type GroupedTableColumn } from "@/components/GroupedTable"
 import ScoreBar from "@/components/ScoreBar"
 import Avatar from "@/components/Avatar"
@@ -29,6 +31,299 @@ function formatLastActivity(iso: string): string {
   return `${d.toLocaleDateString(undefined, { month: "short", day: "numeric" })} · ${timeStr}`
 }
 
+function formatCount(n: number): string {
+  return n.toLocaleString()
+}
+
+function buildLinkColumns(): GroupedTableColumn<MarketingLink>[] {
+  return [
+    {
+      key: "name",
+      header: "Name",
+      render: (row) => (
+        <a className="table-link track-engagement__link-cell" href="#">
+          <span className="track-engagement__link-thumb" aria-hidden>
+            <span className="material-symbols-outlined">
+              {row.type === "embed" ? "code" : "link"}
+            </span>
+          </span>
+          <span className="track-engagement__link-text">
+            <span className="track-engagement__link-name">
+              {row.name}
+              <span className="material-symbols-outlined table-link__icon">arrow_forward</span>
+            </span>
+            <span className="track-engagement__link-kind">
+              {row.type === "embed" ? "Embed" : "Link"}
+            </span>
+          </span>
+        </a>
+      ),
+    },
+    {
+      key: "demo",
+      header: "Demo",
+      render: (row) => {
+        const extra = row.demos.length - 1
+        return (
+          <span className="track-engagement__link-demo">
+            {row.demos[0] ?? "—"}
+            {extra > 0 && (
+              <span className="track-engagement__link-demo-more">, +{extra}</span>
+            )}
+          </span>
+        )
+      },
+    },
+    {
+      key: "campaign",
+      header: "Campaign",
+      render: (row) => <span className="track-engagement__link-campaign">{row.campaign}</span>,
+    },
+    {
+      key: "views",
+      header: "Views",
+      render: (row) => (
+        <span className="track-engagement__metric-cell">
+          <span className="track-engagement__metric-value">{formatCount(row.views)}</span>
+          <span className="track-engagement__metric-sub">{formatCount(row.uniqueViewers)} unique</span>
+        </span>
+      ),
+    },
+    {
+      key: "leads",
+      header: "Leads",
+      render: (row) => (
+        <span className="track-engagement__metric-cell">
+          <span className="track-engagement__metric-value">{formatCount(row.leads)}</span>
+          <span className="track-engagement__metric-sub">{row.conversionRate.toFixed(1)}% conv.</span>
+        </span>
+      ),
+    },
+    {
+      key: "conversionRate",
+      header: "Conversion",
+      render: (row) => <ScoreBar score={Math.round(row.conversionRate)} />,
+    },
+    {
+      key: "lastActivityAt",
+      header: "Last activity",
+      render: (row) => (
+        <span className="table-last-activity-cell">{formatLastActivity(row.lastActivityAt)}</span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "",
+      render: (row) => (
+        <button
+          type="button"
+          className="track-engagement__row-share"
+          aria-label={`Share ${row.name}`}
+        >
+          <span className="material-symbols-outlined" aria-hidden>
+            ios_share
+          </span>
+          Share
+        </button>
+      ),
+    },
+  ]
+}
+
+function buildSalesLinkColumns(
+  onBuyingGroupClick: (group: string) => void,
+): GroupedTableColumn<SalesLink>[] {
+  return [
+    {
+      key: "name",
+      header: "Name",
+      render: (row) => (
+        <a className="table-link track-engagement__link-cell" href="#">
+          <span className="track-engagement__link-thumb" aria-hidden>
+            <span className="material-symbols-outlined">link</span>
+          </span>
+          <span className="track-engagement__link-text">
+            <span className="track-engagement__link-name">
+              {row.name}
+              <span className="material-symbols-outlined table-link__icon">arrow_forward</span>
+            </span>
+            <span className="track-engagement__link-kind">Link</span>
+          </span>
+        </a>
+      ),
+    },
+    {
+      key: "demo",
+      header: "Demo",
+      render: (row) => {
+        const extra = row.demos.length - 1
+        return (
+          <span className="track-engagement__link-demo">
+            {row.demos[0] ?? "—"}
+            {extra > 0 && (
+              <span className="track-engagement__link-demo-more">, +{extra}</span>
+            )}
+          </span>
+        )
+      },
+    },
+    {
+      key: "account",
+      header: "Account",
+      render: (row) => (
+        <a
+          className="table-link"
+          href="#"
+          onClick={(e) => { e.preventDefault(); onBuyingGroupClick(row.account) }}
+        >
+          <CompanyLogo domain={row.domain} size={20} />
+          {row.account}
+          <span className="material-symbols-outlined table-link__icon">arrow_forward</span>
+        </a>
+      ),
+    },
+    {
+      key: "views",
+      header: "Views",
+      render: (row) => (
+        <span className="track-engagement__metric-cell">
+          <span className="track-engagement__metric-value">{formatCount(row.views)}</span>
+          <span className="track-engagement__metric-sub">{formatCount(row.uniqueViewers)} unique</span>
+        </span>
+      ),
+    },
+    {
+      key: "viewers",
+      header: "Viewers",
+      render: (row) => (
+        <span className="track-engagement__metric-cell">
+          <span className="track-engagement__metric-value">{formatCount(row.viewers)}</span>
+          <span className="track-engagement__metric-sub">
+            {row.uniqueViewers > 0
+              ? `${Math.round((row.viewers / row.uniqueViewers) * 100)}% identified`
+              : "—"}
+          </span>
+        </span>
+      ),
+    },
+    {
+      key: "engagementScore",
+      header: "Engagement",
+      render: (row) => <ScoreBar score={row.engagementScore} />,
+    },
+    {
+      key: "lastActivityAt",
+      header: "Last activity",
+      render: (row) => (
+        <span className="table-last-activity-cell">{formatLastActivity(row.lastActivityAt)}</span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "",
+      render: (row) => (
+        <button
+          type="button"
+          className="track-engagement__row-share"
+          aria-label={`Share ${row.name}`}
+        >
+          <span className="material-symbols-outlined" aria-hidden>
+            ios_share
+          </span>
+          Share
+        </button>
+      ),
+    },
+  ]
+}
+
+const linkSortOptions = [
+  { key: "views", label: "Views" },
+  { key: "leads", label: "Leads" },
+  { key: "conversionRate", label: "Conversion" },
+  { key: "name", label: "Name" },
+  { key: "demo", label: "Demo" },
+  { key: "campaign", label: "Campaign" },
+  { key: "lastActivityAt", label: "Last activity" },
+]
+
+const linkQuickFilters = [
+  { label: "Type", icon: "category" },
+  { label: "Demo", icon: "smart_display" },
+  { label: "Campaign", icon: "campaign" },
+  { label: "Columns", icon: "view_column" },
+]
+
+const linkGroupOptions = [
+  { key: "individual", label: "Individual" },
+  { key: "demo", label: "Demo" },
+]
+
+const salesLinkSortOptions = [
+  { key: "views", label: "Views" },
+  { key: "viewers", label: "Viewers" },
+  { key: "engagementScore", label: "Engagement" },
+  { key: "name", label: "Name" },
+  { key: "demo", label: "Demo" },
+  { key: "account", label: "Account" },
+  { key: "lastActivityAt", label: "Last activity" },
+]
+
+const salesLinkQuickFilters = [
+  { label: "Account", icon: "business" },
+  { label: "Demo", icon: "smart_display" },
+  { label: "Columns", icon: "view_column" },
+]
+
+const salesLinkGroupOptions = [
+  { key: "individual", label: "Individual" },
+  { key: "account", label: "Account" },
+]
+
+function getLinkSortValue(row: MarketingLink, field: string): string | number {
+  switch (field) {
+    case "name": return row.name
+    case "demo": return row.demos[0] ?? ""
+    case "campaign": return row.campaign
+    case "type": return row.type
+    case "views": return row.views
+    case "leads": return row.leads
+    case "conversionRate": return row.conversionRate
+    case "lastActivityAt": return row.lastActivityAt
+    default: return ""
+  }
+}
+
+function getLinkGroupValue(row: MarketingLink, field: string): string {
+  switch (field) {
+    case "demo": return row.demos[0] ?? ""
+    case "campaign": return row.campaign
+    case "type": return row.type === "embed" ? "Embeds" : "Links"
+    default: return ""
+  }
+}
+
+function getSalesLinkSortValue(row: SalesLink, field: string): string | number {
+  switch (field) {
+    case "name": return row.name
+    case "demo": return row.demos[0] ?? ""
+    case "account": return row.account
+    case "views": return row.views
+    case "viewers": return row.viewers
+    case "engagementScore": return row.engagementScore
+    case "lastActivityAt": return row.lastActivityAt
+    default: return ""
+  }
+}
+
+function getSalesLinkGroupValue(row: SalesLink, field: string): string {
+  switch (field) {
+    case "account": return row.account
+    case "demo": return row.demos[0] ?? ""
+    default: return ""
+  }
+}
+
 export type TrackEngagementView = "acquisition" | "pipeline"
 
 interface TrackEngagementProps {
@@ -40,7 +335,7 @@ interface TrackEngagementProps {
 }
 
 export const ACQUISITION_TABS = [
-  { id: "viewers", label: "Track Viewers" },
+  { id: "viewers", label: "Viewers" },
   { id: "links-embeds", label: "Links & Embeds" },
   { id: "campaigns", label: "Campaigns" },
   { id: "viewer-journeys", label: "Viewer journeys" },
@@ -50,7 +345,8 @@ export const ACQUISITION_TABS = [
 ] as const
 
 export const PIPELINE_TABS = [
-  { id: "buyers", label: "Track Viewers" },
+  { id: "accounts", label: "Accounts" },
+  { id: "buyers", label: "Buyers" },
   { id: "deal-links", label: "Links" },
 ] as const
 
@@ -64,6 +360,74 @@ const VIEWERS_SUB_TABS = [
 type ViewersSubTabId = (typeof VIEWERS_SUB_TABS)[number]["id"]
 
 type LeadsTableVariant = "acquisition" | "pipeline"
+type AccountsTableVariant = "acquisition" | "pipeline"
+
+function buildAccountColumns(
+  onBuyingGroupClick: (group: string) => void,
+  variant: AccountsTableVariant,
+): GroupedTableColumn<AccountRecord>[] {
+  const isAcquisition = variant === "acquisition"
+
+  const cols: GroupedTableColumn<AccountRecord>[] = [
+    {
+      key: "name",
+      header: isAcquisition ? "Company" : "Account",
+      render: (row) => (
+        <a
+          className="table-link name-cell"
+          href="#"
+          onClick={(e) => { e.preventDefault(); onBuyingGroupClick(row.company) }}
+        >
+          <CompanyLogo domain={row.domain} size={20} />
+          <span className="name-cell__text">
+            <span className="name-cell__name">
+              {row.name}
+              <span className="material-symbols-outlined table-link__icon">arrow_forward</span>
+            </span>
+            {!isAcquisition && row.company !== row.name && (
+              <span className="name-cell__role">{row.company}</span>
+            )}
+          </span>
+        </a>
+      ),
+    },
+    {
+      key: "viewers",
+      header: "Viewers",
+      render: (row) => (
+        <span className="track-engagement__metric-cell">
+          <span className="track-engagement__metric-value">{formatCount(row.viewers)}</span>
+          <span className="track-engagement__metric-sub">identified</span>
+        </span>
+      ),
+    },
+  ]
+
+  if (!isAcquisition) {
+    cols.push({
+      key: "opportunity",
+      header: "Opportunity",
+      render: (row) => row.opportunity,
+    })
+  }
+
+  cols.push(
+    {
+      key: "lastActivityAt",
+      header: "Last activity",
+      render: (row) => (
+        <span className="table-last-activity-cell">{formatLastActivity(row.lastActivityAt)}</span>
+      ),
+    },
+    {
+      key: "engagementScore",
+      header: "Engagement Score",
+      render: (row) => <ScoreBar score={row.engagementScore} />,
+    },
+  )
+
+  return cols
+}
 
 function buildColumns(
   onPersonClick: (lead: Lead) => void,
@@ -153,6 +517,28 @@ function buildColumns(
     header: "Engagement Score",
     render: (row) => <ScoreBar score={row.engagementScore} />,
   })
+
+  if (isAcquisition) {
+    cols.push({
+      key: "actions",
+      header: "",
+      render: (row) => (
+        <span className="track-engagement__row-handoff-wrap">
+          <button
+            type="button"
+            className="track-engagement__row-handoff"
+            aria-label={`Hand off ${row.firstName} ${row.lastName} to sales`}
+          >
+            Handoff
+          </button>
+          <span className="track-engagement__row-handoff-tip" role="tooltip">
+            Triggered automatically by CRM sync status where available
+          </span>
+        </span>
+      ),
+    })
+  }
+
   return cols
 }
 
@@ -177,6 +563,38 @@ const acquisitionGroupOptions = [
   { key: "individual", label: "Individual" },
   { key: "company", label: "Company" },
 ]
+
+const accountSortOptions = [
+  { key: "engagementScore", label: "Engagement" },
+  { key: "name", label: "Account" },
+  { key: "viewers", label: "Viewers" },
+  { key: "lastActivityAt", label: "Last activity" },
+  { key: "opportunity", label: "Opportunity" },
+]
+
+const pipelineAccountGroupOptions = [
+  { key: "individual", label: "Individual" },
+  { key: "company", label: "Parent company" },
+]
+
+function getAccountSortValue(row: AccountRecord, field: string): string | number {
+  switch (field) {
+    case "name": return row.name
+    case "viewers": return row.viewers
+    case "engagementScore": return row.engagementScore
+    case "lastActivityAt": return row.lastActivityAt
+    case "opportunity": return row.opportunity
+    case "company": return row.company
+    default: return ""
+  }
+}
+
+function getAccountGroupValue(row: AccountRecord, field: string): string {
+  switch (field) {
+    case "company": return row.company
+    default: return ""
+  }
+}
 
 const pipelineGroupOptions = [
   { key: "individual", label: "Individual" },
@@ -215,6 +633,16 @@ function TabPlaceholder({ title, body }: { title: string; body: string }) {
   )
 }
 
+function AccountsDashboardPlaceholder() {
+  return (
+    <section className="track-engagement__accounts-dashboard" aria-label="Dashboard placeholder">
+      <h2 className="track-engagement__accounts-dashboard-title">
+        Kyle Brauner Dashboard Placeholder
+      </h2>
+    </section>
+  )
+}
+
 export default function TrackEngagement({
   view,
   acquisitionTab,
@@ -224,19 +652,31 @@ export default function TrackEngagement({
 }: TrackEngagementProps) {
   const acquisitionColumns = buildColumns(onPersonClick, onBuyingGroupClick, "acquisition")
   const pipelineColumns = buildColumns(onPersonClick, onBuyingGroupClick, "pipeline")
+  const pipelineAccountColumns = buildAccountColumns(onBuyingGroupClick, "pipeline")
+  const linkColumns = buildLinkColumns()
+  const salesLinkColumns = buildSalesLinkColumns(onBuyingGroupClick)
 
   const [leadsSortBy, setLeadsSortBy] = useState<string | null>("engagementScore")
   const [leadsGroupBy, setLeadsGroupBy] = useState<string | null>(null)
   const [viewersSubTab, setViewersSubTab] = useState<ViewersSubTabId>("demo-leads")
 
+  const [linksSortBy, setLinksSortBy] = useState<string | null>("views")
+  const [linksGroupBy, setLinksGroupBy] = useState<string | null>(null)
+
+  const [salesLinksSortBy, setSalesLinksSortBy] = useState<string | null>("views")
+  const [salesLinksGroupBy, setSalesLinksGroupBy] = useState<string | null>(null)
+
   const [pipelineSortBy, setPipelineSortBy] = useState<string | null>("engagementScore")
   const [pipelineGroupBy, setPipelineGroupBy] = useState<string | null>("company")
+
+  const [salesAccountsSortBy, setSalesAccountsSortBy] = useState<string | null>("engagementScore")
+  const [salesAccountsGroupBy, setSalesAccountsGroupBy] = useState<string | null>(null)
 
   const isAcquisition = view === "acquisition"
 
   const pageTitle = isAcquisition
-    ? ACQUISITION_TABS.find((t) => t.id === acquisitionTab)?.label ?? "Track Viewers"
-    : PIPELINE_TABS.find((t) => t.id === pipelineTab)?.label ?? "Track Viewers"
+    ? ACQUISITION_TABS.find((t) => t.id === acquisitionTab)?.label ?? "Viewers"
+    : PIPELINE_TABS.find((t) => t.id === pipelineTab)?.label ?? "Buyers"
 
   return (
     <div className="track-engagement">
@@ -300,9 +740,20 @@ export default function TrackEngagement({
           </div>
         )}
         {isAcquisition && acquisitionTab === "links-embeds" && (
-          <TabPlaceholder
-            title="Links & Embeds"
-            body="Create and organize lead gen links for your prospects, and embed demos and tours on your site and campaigns. Prototype: connect link templates to buyer journeys; map embeds to lead sources and UTM tags."
+          <GroupedTable
+            columns={linkColumns}
+            data={marketingLinksData}
+            sortBy={linksSortBy}
+            groupBy={linksGroupBy}
+            onSortChange={setLinksSortBy}
+            onGroupChange={setLinksGroupBy}
+            sortOptions={linkSortOptions}
+            groupOptions={linkGroupOptions}
+            getSortValue={getLinkSortValue}
+            getGroupValue={getLinkGroupValue}
+            quickFilters={linkQuickFilters}
+            viewByFlatIcon="link"
+            viewByGroupedIcon="smart_display"
           />
         )}
         {isAcquisition && acquisitionTab === "campaigns" && (
@@ -336,6 +787,31 @@ export default function TrackEngagement({
           />
         )}
 
+        {!isAcquisition && pipelineTab === "accounts" && (
+          <>
+            <AccountsDashboardPlaceholder />
+            <GroupedTable
+            columns={pipelineAccountColumns}
+            data={salesAccountsData}
+            sortBy={salesAccountsSortBy}
+            groupBy={salesAccountsGroupBy}
+            onSortChange={setSalesAccountsSortBy}
+            onGroupChange={setSalesAccountsGroupBy}
+            sortOptions={accountSortOptions}
+            groupOptions={pipelineAccountGroupOptions}
+            getSortValue={getAccountSortValue}
+            getGroupValue={getAccountGroupValue}
+            onGroupHeaderClick={salesAccountsGroupBy === "company" ? onBuyingGroupClick : undefined}
+            quickFilters={[
+              { label: "Account", icon: "business" },
+              { label: "Opportunity", icon: "work" },
+              { label: "Columns", icon: "view_column" },
+            ]}
+            viewByFlatIcon="business"
+            viewByGroupedIcon="corporate_fare"
+          />
+          </>
+        )}
         {!isAcquisition && pipelineTab === "buyers" && (
           <GroupedTable
             columns={pipelineColumns}
@@ -352,9 +828,21 @@ export default function TrackEngagement({
           />
         )}
         {!isAcquisition && pipelineTab === "deal-links" && (
-          <TabPlaceholder
-            title="Links"
-            body="Deal-stage links and renewal packages. Prototype: tie links to opportunities in flight."
+          <GroupedTable
+            columns={salesLinkColumns}
+            data={salesLinksData}
+            sortBy={salesLinksSortBy}
+            groupBy={salesLinksGroupBy}
+            onSortChange={setSalesLinksSortBy}
+            onGroupChange={setSalesLinksGroupBy}
+            sortOptions={salesLinkSortOptions}
+            groupOptions={salesLinkGroupOptions}
+            getSortValue={getSalesLinkSortValue}
+            getGroupValue={getSalesLinkGroupValue}
+            onGroupHeaderClick={salesLinksGroupBy === "account" ? onBuyingGroupClick : undefined}
+            quickFilters={salesLinkQuickFilters}
+            viewByFlatIcon="link"
+            viewByGroupedIcon="business"
           />
         )}
       </div>

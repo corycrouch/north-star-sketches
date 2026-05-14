@@ -14,6 +14,7 @@ import DashboardPage from "@/components/DashboardPage"
 import ClaudeBuyerPage from "@/components/ClaudeBuyerPage"
 import DemoRoomPage from "@/components/DemoRoomPage"
 import type { DemoRecord } from "@/data/demos"
+import type { DemoContentItem } from "@/types/demo-content"
 import "@/styles/app.scss"
 
 /**
@@ -51,9 +52,14 @@ function App() {
   const [salesTab, setSalesTab] = useState<PipelineTabId>("buyers")
   const [subPage, setSubPage] = useState<SubPage>({ type: "none" })
   const [demoName, setDemoName] = useState("")
-  const [flowBuilder, setFlowBuilder] = useState<{ open: boolean; title: string }>({
+  const [flowBuilder, setFlowBuilder] = useState<{
+    open: boolean
+    title: string
+    seedContent: DemoContentItem[]
+  }>({
     open: false,
     title: "",
+    seedContent: [],
   })
   const [demoHasFlowPreview, setDemoHasFlowPreview] = useState(false)
   /** Demo fake screen-recording: full viewport, no left nav (simulated shared tab). */
@@ -101,12 +107,12 @@ function App() {
     setSubPage({ type: "none" })
   }
 
-  function openFlowBuilder(demoTitle: string) {
-    setFlowBuilder({ open: true, title: demoTitle })
+  function openFlowBuilder(demoTitle: string, seedContent: DemoContentItem[] = []) {
+    setFlowBuilder({ open: true, title: demoTitle, seedContent })
   }
 
   function closeFlowBuilder(result: { hasCannedFlow: boolean }) {
-    setFlowBuilder({ open: false, title: "" })
+    setFlowBuilder({ open: false, title: "", seedContent: [] })
     if (result.hasCannedFlow) {
       setDemoHasFlowPreview(true)
     }
@@ -134,7 +140,11 @@ function App() {
 
   if (flowBuilder.open) {
     return (
-      <FlowBuilderPage demoTitle={flowBuilder.title} onClose={closeFlowBuilder} />
+      <FlowBuilderPage
+        demoTitle={flowBuilder.title}
+        seedContent={flowBuilder.seedContent}
+        onClose={closeFlowBuilder}
+      />
     )
   }
 

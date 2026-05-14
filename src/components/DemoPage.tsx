@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import CannedFlowGraphic, { getCannedFlowContentSummary } from "@/components/CannedFlowGraphic"
+import ShareDemoBoardModal from "@/components/ShareDemoBoardModal"
 import ChromeSharePickerMock from "@/components/ChromeSharePickerMock"
 import VideoRecordSetupModal from "@/components/VideoRecordSetupModal"
 import RecordingControlDock from "@/components/RecordingControlDock"
+import type { DemoContentItem } from "@/types/demo-content"
 import "@/styles/demo-page.scss"
 import "@/styles/video-record-setup.scss"
 
@@ -13,11 +15,16 @@ interface ContentItem {
   name: string
 }
 
-const CONTENT_TYPES: { type: ContentItem["type"]; icon: string; label: string }[] = [
-  { type: "video", icon: "videocam", label: "Video" },
-  { type: "tour", icon: "tour", label: "Tour" },
-  { type: "document", icon: "description", label: "SmartDoc" },
-  { type: "sandbox", icon: "code_blocks", label: "Sandbox" },
+const CONTENT_TYPES: {
+  type: ContentItem["type"]
+  icon: string
+  label: string
+  createLabel: string
+}[] = [
+  { type: "video", icon: "videocam", label: "Video", createLabel: "Create Video" },
+  { type: "tour", icon: "tour", label: "Tour", createLabel: "Create Tour" },
+  { type: "document", icon: "description", label: "SmartDoc", createLabel: "Create SmartDoc" },
+  { type: "sandbox", icon: "code_blocks", label: "Sim", createLabel: "Create Sim" },
 ]
 
 interface LibraryItem {
@@ -40,7 +47,7 @@ const LIBRARY_ITEMS: LibraryItem[] = [
 interface DemoPageProps {
   initialName: string
   onBack: () => void
-  onOpenFlowBuilder: (demoTitle: string) => void
+  onOpenFlowBuilder: (demoTitle: string, seedContent?: DemoContentItem[]) => void
   /** Set when returning from Flow Builder with the canned sample flow on canvas */
   hasFlowPreview?: boolean
   onClearFlowPreview?: () => void
@@ -91,6 +98,7 @@ export default function DemoPage({
   /** Camera preview bubble; set on record setup, persists through share → REC → saving when on. */
   const [recordCameraOn, setRecordCameraOn] = useState(true)
   const [recordingPaused, setRecordingPaused] = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
   const [sharePickerHost, setSharePickerHost] = useState("")
   /** 3 → 2 → 1 on fake recording screen, then null = timer runs */
   const [recordingCountdown, setRecordingCountdown] = useState<number | null>(null)
@@ -218,6 +226,13 @@ export default function DemoPage({
   }
 
   const itemCount = contentItems.length
+
+  function openFlowBuilderWithContent() {
+    onOpenFlowBuilder(
+      name,
+      contentItems.map((item) => ({ type: item.type, name: item.name })),
+    )
+  }
   const filteredLibrary = LIBRARY_ITEMS.filter((item) =>
     item.name.toLowerCase().includes(librarySearch.toLowerCase())
   )
@@ -281,7 +296,11 @@ export default function DemoPage({
             <span className="material-symbols-outlined">play_arrow</span>
             Preview
           </button>
-          <button type="button" className="demo-page__action-btn demo-page__action-btn--primary">
+          <button
+            type="button"
+            className="demo-page__action-btn demo-page__action-btn--primary"
+            onClick={() => setShowShareModal(true)}
+          >
             <span className="material-symbols-outlined">send</span>
             Share
           </button>
@@ -298,7 +317,7 @@ export default function DemoPage({
               <button
                 type="button"
                 className="demo-page__single-preview-edit"
-                onClick={() => onOpenFlowBuilder(name)}
+                onClick={() => openFlowBuilderWithContent()}
                 aria-label="Edit flow"
               >
                 <span className="material-symbols-outlined">edit</span>
@@ -326,7 +345,7 @@ export default function DemoPage({
           <button
             type="button"
             className="demo-page__flow-create-btn demo-page__flow-create-btn--split"
-            onClick={() => onOpenFlowBuilder(name)}
+            onClick={() => openFlowBuilderWithContent()}
           >
             <span className="demo-page__flow-create-lead">
               <span className="material-symbols-outlined">add</span>
@@ -355,7 +374,7 @@ export default function DemoPage({
                 }}
               >
                 <span className="material-symbols-outlined demo-page__type-icon">{ct.icon}</span>
-                <span className="demo-page__type-label">{ct.label}</span>
+                <span className="demo-page__type-label">{ct.createLabel}</span>
               </button>
             ))}
           </div>
@@ -424,7 +443,7 @@ export default function DemoPage({
             <button
               type="button"
               className="demo-page__library-btn"
-              onClick={() => onOpenFlowBuilder(name)}
+              onClick={() => openFlowBuilderWithContent()}
             >
               <span className="material-symbols-outlined">account_tree</span>
               Build Flow
@@ -485,7 +504,7 @@ export default function DemoPage({
             <button
               type="button"
               className="demo-page__flow-create-btn demo-page__flow-create-btn--split"
-              onClick={() => onOpenFlowBuilder(name)}
+              onClick={() => openFlowBuilderWithContent()}
             >
               <span className="demo-page__flow-create-lead">
                 <span className="material-symbols-outlined">account_tree</span>
@@ -535,7 +554,7 @@ export default function DemoPage({
           <button
             type="button"
             className="demo-page__flow-create-btn"
-            onClick={() => onOpenFlowBuilder(name)}
+            onClick={() => openFlowBuilderWithContent()}
           >
             <span className="material-symbols-outlined">account_tree</span>
             Edit Flow to Add More Content
@@ -697,6 +716,14 @@ export default function DemoPage({
             </div>
           )}
         </>
+      )}
+
+      {showShareModal && (
+        <ShareDemoBoardModal
+          demoName={name}
+          sharedCount={Math.max(itemCount, 1)}
+          onClose={() => setShowShareModal(false)}
+        />
       )}
     </div>
   )

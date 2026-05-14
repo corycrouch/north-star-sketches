@@ -196,13 +196,17 @@ function useClickOutside(
   }, [popoutRef, anchorRef, onClose])
 }
 
+function findCreateMenuItem(id: string): CreateMenuItem | undefined {
+  return CREATE_MENU_ITEMS.find((item) => item.id === id)
+}
+
 function CreatePopout({ anchorRef, onClose, onCreateDemo }: PopoutProps) {
   const popoutRef = useRef<HTMLDivElement>(null)
   const pos = usePopoutPosition(anchorRef)
   useClickOutside(popoutRef, anchorRef, onClose)
   const [hoveredId, setHoveredId] = useState("demo")
 
-  const active = CREATE_MENU_ITEMS.find((item) => item.id === hoveredId) ?? CREATE_MENU_ITEMS[0]
+  const active = findCreateMenuItem(hoveredId) ?? CREATE_MENU_ITEMS[0]
 
   function handleDemoLaunch() {
     onClose()
@@ -211,6 +215,32 @@ function CreatePopout({ anchorRef, onClose, onCreateDemo }: PopoutProps) {
 
   function handleNavClick(item: CreateMenuItem) {
     if (item.opensDemo) handleDemoLaunch()
+  }
+
+  function renderNavButton(item: CreateMenuItem) {
+    const isActive = hoveredId === item.id
+    return (
+      <button
+        type="button"
+        className={[
+          "create-popout__nav-item",
+          isActive ? "create-popout__nav-item--active" : "",
+          item.opensDemo ? "create-popout__nav-item--launch" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        onMouseEnter={() => setHoveredId(item.id)}
+        onFocus={() => setHoveredId(item.id)}
+        onClick={() => handleNavClick(item)}
+      >
+        <span className="create-popout__nav-icon-wrap">
+          <span className="material-symbols-outlined create-popout__nav-icon">
+            {item.icon}
+          </span>
+        </span>
+        <span className="create-popout__nav-label">{item.title}</span>
+      </button>
+    )
   }
 
   return createPortal(
@@ -224,20 +254,7 @@ function CreatePopout({ anchorRef, onClose, onCreateDemo }: PopoutProps) {
         <nav className="create-popout__sidebar" aria-label="Create options">
           <ul className="create-popout__nav-list">
             {CREATE_MENU_ITEMS.map((item) => (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  className={`create-popout__nav-item ${hoveredId === item.id ? "create-popout__nav-item--active" : ""} ${item.opensDemo ? "create-popout__nav-item--launch" : ""}`}
-                  onMouseEnter={() => setHoveredId(item.id)}
-                  onFocus={() => setHoveredId(item.id)}
-                  onClick={() => handleNavClick(item)}
-                >
-                  <span className="create-popout__nav-icon-wrap">
-                    <span className="material-symbols-outlined create-popout__nav-icon">{item.icon}</span>
-                  </span>
-                  <span className="create-popout__nav-label">{item.title}</span>
-                </button>
-              </li>
+              <li key={item.id}>{renderNavButton(item)}</li>
             ))}
           </ul>
         </nav>

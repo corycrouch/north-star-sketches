@@ -171,6 +171,79 @@
     align-items: stretch;
     justify-content: stretch;
   }
+
+  &--has-seed {
+    cursor: default;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+}
+
+.flow-builder__seed-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 36rem;
+}
+
+.flow-builder__seed-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: min(100%, 18rem);
+  padding: 0.75rem;
+  border: var(--stroke) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--plane);
+  backdrop-filter: blur(var(--plane-blur));
+  box-shadow: 0 0.15rem 0 var(--border);
+}
+
+.flow-builder__seed-card-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: calc(var(--radius) * 0.75);
+  border: calc(var(--stroke) * 0.5) solid var(--border);
+  background: color-mix(in oklch, var(--foreground) 6%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .material-symbols-outlined {
+    font-size: 2.5rem;
+    opacity: 0.45;
+  }
+}
+
+.flow-builder__seed-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.flow-builder__seed-card-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  .material-symbols-outlined {
+    font-size: 0.95rem;
+  }
+}
+
+.flow-builder__seed-card-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .flow-builder__canned-flow {
@@ -305,4 +378,36 @@
   border-radius: var(--radius);
   border: var(--stroke) solid var(--border);
   background: color-mix(in oklch, var(--background) 88%, transparent);
+
+  &--filled {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.65rem 0.75rem;
+    min-height: 4.75rem;
+    background: var(--background);
+  }
+}
+
+.flow-builder__content-card-icon {
+  font-size: 1.1rem;
+  opacity: 0.7;
+}
+
+.flow-builder__content-card-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.55;
+}
+
+.flow-builder__content-card-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
