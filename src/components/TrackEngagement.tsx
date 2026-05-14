@@ -2,6 +2,12 @@ import { useState } from "react"
 import { leadsData, pipelineData, type Lead } from "@/data/leads"
 import { salesAccountsData, type AccountRecord } from "@/data/accounts"
 import { marketingLinksData, salesLinksData, type MarketingLink, type SalesLink } from "@/data/links"
+import {
+  ACQUISITION_TABS,
+  PIPELINE_TABS,
+  type AcquisitionTabId,
+  type PipelineTabId,
+} from "@/data/track-engagement-tabs"
 import GroupedTable, { type GroupedTableColumn } from "@/components/GroupedTable"
 import ScoreBar from "@/components/ScoreBar"
 import Avatar from "@/components/Avatar"
@@ -333,25 +339,6 @@ interface TrackEngagementProps {
   onPersonClick: (lead: Lead) => void
   onBuyingGroupClick: (group: string) => void
 }
-
-export const ACQUISITION_TABS = [
-  { id: "viewers", label: "Viewers" },
-  { id: "links-embeds", label: "Links & Embeds" },
-  { id: "campaigns", label: "Campaigns" },
-  { id: "viewer-journeys", label: "Viewer journeys" },
-  { id: "segmentation", label: "Segmentation" },
-  { id: "ab-tests", label: "A/B Tests" },
-  { id: "forms", label: "Forms" },
-] as const
-
-export const PIPELINE_TABS = [
-  { id: "accounts", label: "Accounts" },
-  { id: "buyers", label: "Buyers" },
-  { id: "deal-links", label: "Links" },
-] as const
-
-export type AcquisitionTabId = (typeof ACQUISITION_TABS)[number]["id"]
-export type PipelineTabId = (typeof PIPELINE_TABS)[number]["id"]
 
 const VIEWERS_SUB_TABS = [
   { id: "demo-leads" as const, label: "Demo Leads" },

@@ -65,7 +65,7 @@ export default function GroupedTable<T>({
   const groupedFieldKey = groupOptions[1]?.key ?? "company"
 
   const processed = useMemo(() => {
-    let rows = [...data]
+    const rows = [...data]
 
     if (sortBy) {
       rows.sort((a, b) => {

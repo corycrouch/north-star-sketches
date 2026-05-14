@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react"
 import type { Lead } from "@/data/leads"
 import LeftNav from "@/components/LeftNav"
-import TrackEngagement, {
-  type AcquisitionTabId,
-  type PipelineTabId,
-} from "@/components/TrackEngagement"
+import TrackEngagement from "@/components/TrackEngagement"
+import type { AcquisitionTabId, PipelineTabId } from "@/data/track-engagement-tabs"
 import BuyingGroupPage from "@/components/BuyingGroupPage"
 import PersonPage from "@/components/PersonPage"
 import DemoPage from "@/components/DemoPage"

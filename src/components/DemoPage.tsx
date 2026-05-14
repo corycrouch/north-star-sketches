@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import CannedFlowGraphic, { getCannedFlowContentSummary } from "@/components/CannedFlowGraphic"
+import CannedFlowGraphic from "@/components/CannedFlowGraphic"
+import { getCannedFlowContentSummary } from "@/data/canned-flow"
 import ShareDemoBoardModal from "@/components/ShareDemoBoardModal"
 import ChromeSharePickerMock from "@/components/ChromeSharePickerMock"
 import VideoRecordSetupModal from "@/components/VideoRecordSetupModal"

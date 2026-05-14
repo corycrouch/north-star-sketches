@@ -6,7 +6,7 @@ import {
   PIPELINE_TABS,
   type AcquisitionTabId,
   type PipelineTabId,
-} from "@/components/TrackEngagement"
+} from "@/data/track-engagement-tabs"
 import "@/styles/left-nav.scss"
 
 interface NavItem {

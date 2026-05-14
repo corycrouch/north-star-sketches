@@ -28,7 +28,7 @@ interface BuyerEnrichment {
   badge?: string
 }
 
-function enrich(member: Lead, rank: number): BuyerEnrichment {
+function enrich(_member: Lead, rank: number): BuyerEnrichment {
   const profiles: BuyerEnrichment[] = [
     {
       viewMinutes: 22,
